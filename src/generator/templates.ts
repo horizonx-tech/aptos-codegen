@@ -68,7 +68,7 @@ export const entryFunction = ({
   name: string
   params: string[]
 }) =>
-  `${name}: (args: { type_arguments: any[], arguments: [${params.join(
+  `${name}: (args: { type_arguments: string[], arguments: [${params.join(
     ', ',
   )}] }) => Promise<void>`
 
