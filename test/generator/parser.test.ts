@@ -23,7 +23,7 @@ describe('parser', () => {
       expect(module.entryFunctions).toHaveLength(1)
       expect(module.resources).toHaveLength(2)
       expect(module.structs).toHaveLength(5)
-      expect(module.dependencies).toHaveLength(10)
+      expect(module.dependencies).toHaveLength(11)
     })
   })
   describe('toTypeStruct', () => {
@@ -160,13 +160,14 @@ describe('parser', () => {
         'AptosModuleClient',
       ])
     })
-    it('add "address" and "TypedMoveResource" if resources is not empty', () => {
+    it('add "address" and "TypedMoveResource" and "Types" if resources is not empty', () => {
       const moduleId = '0x::example'
       const resources: ResourceStruct[] = [{ name: '0x1::example::Example' }]
 
       expect(extractDependencies(moduleId, [], resources, [], [])).toEqual([
         'address',
         'TypedMoveResource',
+        'Types',
         'AptosModuleClient',
       ])
       expect(extractDependencies(moduleId, [], [], [], [])).toHaveLength(0)
@@ -207,7 +208,7 @@ describe('parser', () => {
         extractDependencies(moduleId, entryFunctions, [], [], structs),
       ).toEqual(['AptosModuleClient'])
       expect(extractDependencies(moduleId, [], resources, [], structs)).toEqual(
-        ['address', 'TypedMoveResource', 'AptosModuleClient'],
+        ['address', 'TypedMoveResource', 'Types', 'AptosModuleClient'],
       )
       expect(extractDependencies(moduleId, [], [], [], structs)).toHaveLength(0)
     })

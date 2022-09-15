@@ -3,7 +3,7 @@ import { MoveType } from 'aptos/dist/generated'
 export const JS_NATIVE_TYPES = ['boolean', 'string', 'Array', 'any']
 
 export const RESERVERD_MODULES = [
-  { path: 'aptos', types: ['BCS', 'MaybeHexString'] },
+  { path: 'aptos', types: ['BCS', 'MaybeHexString', 'Types'] },
   {
     path: '@horizonx/aptos-module-client',
     types: [

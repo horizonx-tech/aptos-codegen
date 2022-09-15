@@ -6,6 +6,7 @@ import {
   factory,
   imports,
   resourceGetter,
+  resourceTypeGuard,
   struct,
   structField,
   types,
@@ -104,12 +105,17 @@ const generateTypesContent = ({
     })
   })
 
+  const resourceTypeGuards = module.resources.map(({ name }) =>
+    resourceTypeGuard({ moduleId: module.id, name }),
+  )
+
   return typesContent({
     name: module.name,
     entryFunctions,
     resourceGetters,
     eventsGetters,
     structs,
+    utilities: [...resourceTypeGuards],
   })
 }
 

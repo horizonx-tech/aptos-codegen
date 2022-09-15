@@ -82,7 +82,7 @@ export const extractDependencies = (
     ...structs.flatMap(({ fields }) => fields.flatMap(({ type }) => type)),
   ]
   const additionalDependencies = [
-    ...(resources.length ? ['address', 'TypedMoveResource'] : []),
+    ...(resources.length ? ['address', 'TypedMoveResource', 'Types'] : []),
     ...(entryFunctions.length || resources.length ? ['AptosModuleClient'] : []),
     ...(events.length ? ['TypedEvent', 'EventGetterParams'] : []),
   ]

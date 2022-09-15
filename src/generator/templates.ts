@@ -30,6 +30,7 @@ export const types = ({
 
 export const typesContent = ({
   structs,
+  utilities,
   ...params
 }: {
   name: string
@@ -37,9 +38,12 @@ export const typesContent = ({
   resourceGetters: string[]
   eventsGetters: string[]
   structs: string[]
+  utilities: string[]
 }) => {
   const moduleContent = moduleType(params)
-  return `${moduleContent}${moduleContent && '\n'}${structs.join('\n')}`
+  return `${moduleContent}${moduleContent && '\n'}${structs.join(
+    '\n',
+  )}${utilities.join('\n')}`
 }
 
 const moduleType = ({
@@ -120,6 +124,16 @@ export const struct = ({
 
 export const structField = ({ name, type }: { name: string; type: string }) =>
   `${name}: ${type}`
+
+export const resourceTypeGuard = ({
+  moduleId,
+  name,
+}: {
+  moduleId: string
+  name: string
+}) =>
+  `
+export const is${name} = (resource: Types.MoveResource): resource is { type: string; data: ${name} } => /^${moduleId}::${name}(?:<|$)/.test(resource.type)`
 
 export const imports = (map: Map<string, Set<string>>) =>
   Array.from(map.entries())
