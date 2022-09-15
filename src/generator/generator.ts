@@ -9,6 +9,7 @@ import {
   resourceTypeGuard,
   struct,
   structField,
+  typeParametersExtaractor,
   types,
   typesContent,
 } from './templates'
@@ -108,6 +109,9 @@ const generateTypesContent = ({
   const resourceTypeGuards = module.resources.map(({ name }) =>
     resourceTypeGuard({ moduleId: module.id, name }),
   )
+  const typeParametersExtaractors = module.resources.map(({ name }) =>
+    typeParametersExtaractor({ moduleId: module.id, name }),
+  )
 
   return typesContent({
     name: module.name,
@@ -115,7 +119,7 @@ const generateTypesContent = ({
     resourceGetters,
     eventsGetters,
     structs,
-    utilities: [...resourceTypeGuards],
+    utilities: [...resourceTypeGuards, ...typeParametersExtaractors],
   })
 }
 

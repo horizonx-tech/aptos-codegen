@@ -135,6 +135,19 @@ export const resourceTypeGuard = ({
   `
 export const is${name} = (resource: Types.MoveResource): resource is { type: string; data: ${name} } => /^${moduleId}::${name}(?:<|$)/.test(resource.type)`
 
+export const typeParametersExtaractor = ({
+  moduleId,
+  name,
+}: {
+  moduleId: string
+  name: string
+}) =>
+  `
+export const extract${name}TypeParameters = (type: string) => {
+  const result = /^${moduleId}::${name}<(.*)>$/.exec(type)
+  return result && result[1]?.split(', ')
+}`
+
 export const imports = (map: Map<string, Set<string>>) =>
   Array.from(map.entries())
     .map(

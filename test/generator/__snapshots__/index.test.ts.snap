@@ -80,7 +80,17 @@ export type SignerCapabilityOfferProofChallenge = {
 
 export const isAccount = (resource: Types.MoveResource): resource is { type: string; data: Account } => /^0x1::account::Account(?:<|$)/.test(resource.type)
 
-export const isOriginatingAddress = (resource: Types.MoveResource): resource is { type: string; data: OriginatingAddress } => /^0x1::account::OriginatingAddress(?:<|$)/.test(resource.type)",
+export const isOriginatingAddress = (resource: Types.MoveResource): resource is { type: string; data: OriginatingAddress } => /^0x1::account::OriginatingAddress(?:<|$)/.test(resource.type)
+
+export const extractAccountTypeParameters = (type: string) => {
+  const result = /^0x1::account::Account<(.*)>$/.exec(type)
+  return result && result[1]?.split(', ')
+}
+
+export const extractOriginatingAddressTypeParameters = (type: string) => {
+  const result = /^0x1::account::OriginatingAddress<(.*)>$/.exec(type)
+  return result && result[1]?.split(', ')
+}",
       "path": "./Account.ts",
     },
   },
@@ -140,7 +150,22 @@ export const isAptosCoin = (resource: Types.MoveResource): resource is { type: s
 
 export const isDelegations = (resource: Types.MoveResource): resource is { type: string; data: Delegations } => /^0x1::aptos_coin::Delegations(?:<|$)/.test(resource.type)
 
-export const isMintCapStore = (resource: Types.MoveResource): resource is { type: string; data: MintCapStore } => /^0x1::aptos_coin::MintCapStore(?:<|$)/.test(resource.type)",
+export const isMintCapStore = (resource: Types.MoveResource): resource is { type: string; data: MintCapStore } => /^0x1::aptos_coin::MintCapStore(?:<|$)/.test(resource.type)
+
+export const extractAptosCoinTypeParameters = (type: string) => {
+  const result = /^0x1::aptos_coin::AptosCoin<(.*)>$/.exec(type)
+  return result && result[1]?.split(', ')
+}
+
+export const extractDelegationsTypeParameters = (type: string) => {
+  const result = /^0x1::aptos_coin::Delegations<(.*)>$/.exec(type)
+  return result && result[1]?.split(', ')
+}
+
+export const extractMintCapStoreTypeParameters = (type: string) => {
+  const result = /^0x1::aptos_coin::MintCapStore<(.*)>$/.exec(type)
+  return result && result[1]?.split(', ')
+}",
       "path": "./AptosCoin.ts",
     },
   },
@@ -571,7 +596,32 @@ export const isGovernanceEvents = (resource: Types.MoveResource): resource is { 
 
 export const isGovernanceResponsbility = (resource: Types.MoveResource): resource is { type: string; data: GovernanceResponsbility } => /^0x1::aptos_governance::GovernanceResponsbility(?:<|$)/.test(resource.type)
 
-export const isVotingRecords = (resource: Types.MoveResource): resource is { type: string; data: VotingRecords } => /^0x1::aptos_governance::VotingRecords(?:<|$)/.test(resource.type)",
+export const isVotingRecords = (resource: Types.MoveResource): resource is { type: string; data: VotingRecords } => /^0x1::aptos_governance::VotingRecords(?:<|$)/.test(resource.type)
+
+export const extractApprovedExecutionHashesTypeParameters = (type: string) => {
+  const result = /^0x1::aptos_governance::ApprovedExecutionHashes<(.*)>$/.exec(type)
+  return result && result[1]?.split(', ')
+}
+
+export const extractGovernanceConfigTypeParameters = (type: string) => {
+  const result = /^0x1::aptos_governance::GovernanceConfig<(.*)>$/.exec(type)
+  return result && result[1]?.split(', ')
+}
+
+export const extractGovernanceEventsTypeParameters = (type: string) => {
+  const result = /^0x1::aptos_governance::GovernanceEvents<(.*)>$/.exec(type)
+  return result && result[1]?.split(', ')
+}
+
+export const extractGovernanceResponsbilityTypeParameters = (type: string) => {
+  const result = /^0x1::aptos_governance::GovernanceResponsbility<(.*)>$/.exec(type)
+  return result && result[1]?.split(', ')
+}
+
+export const extractVotingRecordsTypeParameters = (type: string) => {
+  const result = /^0x1::aptos_governance::VotingRecords<(.*)>$/.exec(type)
+  return result && result[1]?.split(', ')
+}",
       "path": "./AptosGovernance.ts",
     },
   },
@@ -1292,7 +1342,22 @@ export const isCoinInfo = (resource: Types.MoveResource): resource is { type: st
 
 export const isCoinStore = (resource: Types.MoveResource): resource is { type: string; data: CoinStore } => /^0x1::coin::CoinStore(?:<|$)/.test(resource.type)
 
-export const isSupplyConfig = (resource: Types.MoveResource): resource is { type: string; data: SupplyConfig } => /^0x1::coin::SupplyConfig(?:<|$)/.test(resource.type)",
+export const isSupplyConfig = (resource: Types.MoveResource): resource is { type: string; data: SupplyConfig } => /^0x1::coin::SupplyConfig(?:<|$)/.test(resource.type)
+
+export const extractCoinInfoTypeParameters = (type: string) => {
+  const result = /^0x1::coin::CoinInfo<(.*)>$/.exec(type)
+  return result && result[1]?.split(', ')
+}
+
+export const extractCoinStoreTypeParameters = (type: string) => {
+  const result = /^0x1::coin::CoinStore<(.*)>$/.exec(type)
+  return result && result[1]?.split(', ')
+}
+
+export const extractSupplyConfigTypeParameters = (type: string) => {
+  const result = /^0x1::coin::SupplyConfig<(.*)>$/.exec(type)
+  return result && result[1]?.split(', ')
+}",
       "path": "./Coin.ts",
     },
   },
@@ -2153,7 +2218,22 @@ export const isPool = (resource: Types.MoveResource): resource is { type: string
 
 export const isPoolEventHandle = (resource: Types.MoveResource): resource is { type: string; data: PoolEventHandle } => /^0x3b6e641ab8f8efad88169e44597b9c6822a158a5292a7aa7c0b41cf821603bd9::pool::PoolEventHandle(?:<|$)/.test(resource.type)
 
-export const isStorage = (resource: Types.MoveResource): resource is { type: string; data: Storage } => /^0x3b6e641ab8f8efad88169e44597b9c6822a158a5292a7aa7c0b41cf821603bd9::pool::Storage(?:<|$)/.test(resource.type)",
+export const isStorage = (resource: Types.MoveResource): resource is { type: string; data: Storage } => /^0x3b6e641ab8f8efad88169e44597b9c6822a158a5292a7aa7c0b41cf821603bd9::pool::Storage(?:<|$)/.test(resource.type)
+
+export const extractPoolTypeParameters = (type: string) => {
+  const result = /^0x3b6e641ab8f8efad88169e44597b9c6822a158a5292a7aa7c0b41cf821603bd9::pool::Pool<(.*)>$/.exec(type)
+  return result && result[1]?.split(', ')
+}
+
+export const extractPoolEventHandleTypeParameters = (type: string) => {
+  const result = /^0x3b6e641ab8f8efad88169e44597b9c6822a158a5292a7aa7c0b41cf821603bd9::pool::PoolEventHandle<(.*)>$/.exec(type)
+  return result && result[1]?.split(', ')
+}
+
+export const extractStorageTypeParameters = (type: string) => {
+  const result = /^0x3b6e641ab8f8efad88169e44597b9c6822a158a5292a7aa7c0b41cf821603bd9::pool::Storage<(.*)>$/.exec(type)
+  return result && result[1]?.split(', ')
+}",
       "path": "./Pool.ts",
     },
   },
@@ -2196,7 +2276,12 @@ export type Table = {
   handle: MaybeHexString
 }
 
-export const isBox = (resource: Types.MoveResource): resource is { type: string; data: Box } => /^0x1::table::Box(?:<|$)/.test(resource.type)",
+export const isBox = (resource: Types.MoveResource): resource is { type: string; data: Box } => /^0x1::table::Box(?:<|$)/.test(resource.type)
+
+export const extractBoxTypeParameters = (type: string) => {
+  const result = /^0x1::table::Box<(.*)>$/.exec(type)
+  return result && result[1]?.split(', ')
+}",
       "path": "./Table.ts",
     },
   },
