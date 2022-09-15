@@ -60,17 +60,22 @@ const moduleType = ({
 `
     : ''
 
-// TODO generic type params
 export const entryFunction = ({
   name,
   params,
 }: {
   name: string
   params: string[]
-}) =>
-  `${name}: (args: { type_arguments: string[], arguments: [${params.join(
-    ', ',
-  )}] }) => Promise<void>`
+}) => {
+  const noParam = params.length === 0
+  const args = [
+    'type_arguments?: string[]',
+    noParam ? undefined : `arguments: [${params.join(', ')}]`,
+  ]
+    .filter(Boolean)
+    .join(', ')
+  return `${name}: (args${noParam ? '?' : ''}: { ${args} }) => Promise<void>`
+}
 
 export const resourceGetter = ({
   name,
