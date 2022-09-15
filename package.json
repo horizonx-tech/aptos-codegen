@@ -1,6 +1,6 @@
 {
   "name": "@horizonx/aptos-codegen",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "author": "HorizonX",
   "license": "MIT",
   "bin": {
