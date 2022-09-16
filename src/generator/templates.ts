@@ -30,7 +30,6 @@ export const types = ({
 
 export const typesContent = ({
   structs,
-  utilities,
   ...params
 }: {
   name: string
@@ -38,12 +37,9 @@ export const typesContent = ({
   resourceGetters: string[]
   eventsGetters: string[]
   structs: string[]
-  utilities: string[]
 }) => {
   const moduleContent = moduleType(params)
-  return `${moduleContent}${moduleContent && '\n'}${structs.join(
-    '\n',
-  )}${utilities.join('\n')}`
+  return `${moduleContent}${moduleContent && '\n'}${structs.join('\n')}`
 }
 
 const moduleType = ({
@@ -125,6 +121,27 @@ export const struct = ({
 export const structField = ({ name, type }: { name: string; type: string }) =>
   `${name}: ${type}`
 
+export const imports = (map: Map<string, Set<string>>) =>
+  Array.from(map.entries())
+    .map(
+      ([path, typeSet]) =>
+        `import { ${Array.from(typeSet).sort().join(', ')} } from '${path}'`,
+    )
+    .join('\n')
+
+export const utilities = ({
+  moduleName,
+  resourceNames,
+  utilitiesContents,
+}: {
+  moduleName: string
+  resourceNames: string[]
+  utilitiesContents: string[]
+}) => `${comments}import { Types } from 'aptos'
+import { ${resourceNames.join(', ')} } from './${moduleName}'
+${utilitiesContents.join('\n')}
+`
+
 export const resourceTypeGuard = ({
   moduleId,
   name,
@@ -153,14 +170,6 @@ export const extract${name}TypeParameters = (type: string) => {
   const result = /^${moduleId}::${name}<(.*)>$/.exec(type)
   return result && result[1]?.split(', ')
 }`
-
-export const imports = (map: Map<string, Set<string>>) =>
-  Array.from(map.entries())
-    .map(
-      ([path, typeSet]) =>
-        `import { ${Array.from(typeSet).sort().join(', ')} } from '${path}'`,
-    )
-    .join('\n')
 
 const genericType = (typeParameters: string[] | undefined) =>
   typeParameters?.length ? `<${typeParameters.join(', ')}>` : ''

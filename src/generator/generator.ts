@@ -12,6 +12,7 @@ import {
   typeParametersExtaractor,
   types,
   typesContent,
+  utilities,
 } from './templates'
 import {
   factoryFileName,
@@ -20,13 +21,16 @@ import {
   toPath,
   toReservedTypeOrAny,
   typesFileName,
+  utilitiesFileName,
 } from './utils'
 
-export const generate = (params: {
+type GeneratorParams = {
   module: ModuleStruct
   resolver: IModuleResolver
   factoryDisabled?: boolean
-}) => ({
+}
+
+export const generate = (params: GeneratorParams) => ({
   factory:
     params.factoryDisabled ||
     (params.module.entryFunctions.length === 0 &&
@@ -43,12 +47,35 @@ export const generate = (params: {
     content: generateTypes(params),
     path: toPath(typesFileName(params.module.name)),
   },
+  utilities:
+    params.module.resources.length === 0
+      ? undefined
+      : {
+          content: generateUtilities(params),
+          path: toPath(utilitiesFileName(params.module.name)),
+        },
 })
 
-const generateTypes = (params: {
-  module: ModuleStruct
-  resolver: IModuleResolver
-}) => {
+const generateUtilities = ({ module, resolver }: GeneratorParams) => {
+  const resourceTypeGuards = module.resources.map(({ name }) => {
+    const structDef = resolver.getStructDefinition(module.id, name)
+    return resourceTypeGuard({
+      moduleId: module.id,
+      name,
+      typeParameters: structDef.typeParameters,
+    })
+  })
+  const typeParametersExtaractors = module.resources.map(({ name }) =>
+    typeParametersExtaractor({ moduleId: module.id, name }),
+  )
+  return utilities({
+    moduleName: module.name,
+    resourceNames: module.resources.map(({ name }) => name),
+    utilitiesContents: [...resourceTypeGuards, ...typeParametersExtaractors],
+  })
+}
+
+const generateTypes = (params: GeneratorParams) => {
   const importsContent = imports(params.resolver.getDependenciesMap())
   return types({
     importsContent,
@@ -56,13 +83,7 @@ const generateTypes = (params: {
   })
 }
 
-const generateTypesContent = ({
-  module,
-  resolver,
-}: {
-  module: ModuleStruct
-  resolver: IModuleResolver
-}) => {
+const generateTypesContent = ({ module, resolver }: GeneratorParams) => {
   const entryFunctions = module.entryFunctions.map(({ name, args }) =>
     entryFunction({
       name,
@@ -106,25 +127,12 @@ const generateTypesContent = ({
     })
   })
 
-  const resourceTypeGuards = module.resources.map(({ name }) => {
-    const structDef = resolver.getStructDefinition(module.id, name)
-    return resourceTypeGuard({
-      moduleId: module.id,
-      name,
-      typeParameters: structDef.typeParameters,
-    })
-  })
-  const typeParametersExtaractors = module.resources.map(({ name }) =>
-    typeParametersExtaractor({ moduleId: module.id, name }),
-  )
-
   return typesContent({
     name: module.name,
     entryFunctions,
     resourceGetters,
     eventsGetters,
     structs,
-    utilities: [...resourceTypeGuards, ...typeParametersExtaractors],
   })
 }
 

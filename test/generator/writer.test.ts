@@ -11,8 +11,9 @@ describe('writer', () => {
     it('call fs functions with passed args', async () => {
       const files = [
         {
-          factory: { content: 'factory', path: 'Factory.ts' },
           types: { content: 'types1', path: 'Types1.ts' },
+          factory: { content: 'factory', path: 'Factory.ts' },
+          utilities: { content: 'utilities', path: 'Utils.ts' },
         },
         { types: { content: 'types2', path: 'Types2.ts' } },
       ]
@@ -31,6 +32,11 @@ describe('writer', () => {
       )
       expect(fsPromises.writeFile).toHaveBeenNthCalledWith(
         3,
+        path.join(outDir, files[0].utilities.path),
+        files[0].utilities.content,
+      )
+      expect(fsPromises.writeFile).toHaveBeenNthCalledWith(
+        4,
         path.join(outDir, files[1].types.path),
         files[1].types.content,
       )

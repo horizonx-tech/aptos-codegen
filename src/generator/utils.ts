@@ -63,6 +63,8 @@ export const toModuleId = (dependency: string): string | undefined => {
 
 export const typesFileName = (moduleName: string) => `${moduleName}.ts`
 
+export const utilitiesFileName = (moduleName: string) => `${moduleName}Utils.ts`
+
 export const factoryFileName = (moduleName: string) =>
   `${moduleName}ModuleFactory.ts`
 
