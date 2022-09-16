@@ -16,10 +16,9 @@ import { Table } from './Table'
 import { AptosModuleClient, EventGetterParams, TypedEvent, TypedMoveResource } from '@horizonx/aptos-module-client'
 
 export interface AccountModule extends AptosModuleClient  {
-  offer_rotation_capability_ed25519: (args: { type_arguments?: string[], arguments: [Array<BCS.Uint8>, Array<BCS.Uint8>, MaybeHexString] }) => Promise<void>
   offer_signer_capability: (args: { type_arguments?: string[], arguments: [Array<BCS.Uint8>, BCS.Uint8, Array<BCS.Uint8>, MaybeHexString] }) => Promise<void>
+  revoke_signer_capability: (args: { type_arguments?: string[], arguments: [MaybeHexString] }) => Promise<void>
   rotate_authentication_key: (args: { type_arguments?: string[], arguments: [BCS.Uint8, Array<BCS.Uint8>, BCS.Uint8, Array<BCS.Uint8>, Array<BCS.Uint8>, Array<BCS.Uint8>] }) => Promise<void>
-  rotate_authentication_key_ed25519: (args: { type_arguments?: string[], arguments: [Array<BCS.Uint8>, Array<BCS.Uint8>, Array<BCS.Uint8>, Array<BCS.Uint8>] }) => Promise<void>
   getAccount: (owner: MaybeHexString, typeParameter?: string) => Promise<TypedMoveResource<Account>>
   getOriginatingAddress: (owner: MaybeHexString, typeParameter?: string) => Promise<TypedMoveResource<OriginatingAddress>>
   getCoinRegisterEvents: (address: MaybeHexString, typeParameter?: string) => Promise<TypedEvent<CoinRegisterEvent>>
@@ -2276,7 +2275,7 @@ export type Table = {
   handle: MaybeHexString
 }
 
-export const isBox = (resource: Types.MoveResource): resource is { type: string; data: Box } => /^0x1::table::Box(?:<|$)/.test(resource.type)
+export const isBox = <T0>(resource: Types.MoveResource): resource is { type: string; data: Box<T0> } => /^0x1::table::Box(?:<|$)/.test(resource.type)
 
 export const extractBoxTypeParameters = (type: string) => {
   const result = /^0x1::table::Box<(.*)>$/.exec(type)

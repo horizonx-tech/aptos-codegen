@@ -106,9 +106,14 @@ const generateTypesContent = ({
     })
   })
 
-  const resourceTypeGuards = module.resources.map(({ name }) =>
-    resourceTypeGuard({ moduleId: module.id, name }),
-  )
+  const resourceTypeGuards = module.resources.map(({ name }) => {
+    const structDef = resolver.getStructDefinition(module.id, name)
+    return resourceTypeGuard({
+      moduleId: module.id,
+      name,
+      typeParameters: structDef.typeParameters,
+    })
+  })
   const typeParametersExtaractors = module.resources.map(({ name }) =>
     typeParametersExtaractor({ moduleId: module.id, name }),
   )

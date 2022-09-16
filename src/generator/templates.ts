@@ -128,12 +128,18 @@ export const structField = ({ name, type }: { name: string; type: string }) =>
 export const resourceTypeGuard = ({
   moduleId,
   name,
+  typeParameters,
 }: {
   moduleId: string
   name: string
+  typeParameters: string[] | undefined
 }) =>
   `
-export const is${name} = (resource: Types.MoveResource): resource is { type: string; data: ${name} } => /^${moduleId}::${name}(?:<|$)/.test(resource.type)`
+export const is${name} = ${genericType(
+    typeParameters,
+  )}(resource: Types.MoveResource): resource is { type: string; data: ${name}${genericType(
+    typeParameters,
+  )} } => /^${moduleId}::${name}(?:<|$)/.test(resource.type)`
 
 export const typeParametersExtaractor = ({
   moduleId,
