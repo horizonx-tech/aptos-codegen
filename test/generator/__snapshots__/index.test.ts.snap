@@ -86,17 +86,25 @@ export type SignerCapabilityOfferProofChallenge = {
 import { Types } from 'aptos'
 import { Account, OriginatingAddress } from './Account'
 
-export const isAccount = (resource: Types.MoveResource): resource is { type: string; data: Account } => /^0x1::account::Account(?:<|$)/.test(resource.type)
+export const isAccount = (resource: Types.MoveResource, ownerAddress?: string): resource is { type: string; data: Account } => {
+  const regexp = ownerAddress ? new RegExp(\`\${ownerAddress}::account::Account(?:<|$)\`) : /^0x1::account::Account(?:<|$)/
+  return regexp.test(resource.type)
+}
 
-export const isOriginatingAddress = (resource: Types.MoveResource): resource is { type: string; data: OriginatingAddress } => /^0x1::account::OriginatingAddress(?:<|$)/.test(resource.type)
+export const isOriginatingAddress = (resource: Types.MoveResource, ownerAddress?: string): resource is { type: string; data: OriginatingAddress } => {
+  const regexp = ownerAddress ? new RegExp(\`\${ownerAddress}::account::OriginatingAddress(?:<|$)\`) : /^0x1::account::OriginatingAddress(?:<|$)/
+  return regexp.test(resource.type)
+}
 
-export const extractAccountTypeParameters = (type: string) => {
-  const result = /^0x1::account::Account<(.*)>$/.exec(type)
+export const extractAccountTypeParameters = (type: string, ownerAddress?: string) => {
+  const regexp = ownerAddress ? new RegExp(\`^\${ownerAddress}::account::Account<(.*)>$\`) : /^0x1::account::Account<(.*)>$/
+  const result = regexp.exec(type)
   return result && result[1]?.split(', ')
 }
 
-export const extractOriginatingAddressTypeParameters = (type: string) => {
-  const result = /^0x1::account::OriginatingAddress<(.*)>$/.exec(type)
+export const extractOriginatingAddressTypeParameters = (type: string, ownerAddress?: string) => {
+  const regexp = ownerAddress ? new RegExp(\`^\${ownerAddress}::account::OriginatingAddress<(.*)>$\`) : /^0x1::account::OriginatingAddress<(.*)>$/
+  const result = regexp.exec(type)
   return result && result[1]?.split(', ')
 }
 ",
@@ -165,24 +173,36 @@ export type MintCapStore = {
 import { Types } from 'aptos'
 import { AptosCoin, Delegations, MintCapStore } from './AptosCoin'
 
-export const isAptosCoin = (resource: Types.MoveResource): resource is { type: string; data: AptosCoin } => /^0x1::aptos_coin::AptosCoin(?:<|$)/.test(resource.type)
+export const isAptosCoin = (resource: Types.MoveResource, ownerAddress?: string): resource is { type: string; data: AptosCoin } => {
+  const regexp = ownerAddress ? new RegExp(\`\${ownerAddress}::aptos_coin::AptosCoin(?:<|$)\`) : /^0x1::aptos_coin::AptosCoin(?:<|$)/
+  return regexp.test(resource.type)
+}
 
-export const isDelegations = (resource: Types.MoveResource): resource is { type: string; data: Delegations } => /^0x1::aptos_coin::Delegations(?:<|$)/.test(resource.type)
+export const isDelegations = (resource: Types.MoveResource, ownerAddress?: string): resource is { type: string; data: Delegations } => {
+  const regexp = ownerAddress ? new RegExp(\`\${ownerAddress}::aptos_coin::Delegations(?:<|$)\`) : /^0x1::aptos_coin::Delegations(?:<|$)/
+  return regexp.test(resource.type)
+}
 
-export const isMintCapStore = (resource: Types.MoveResource): resource is { type: string; data: MintCapStore } => /^0x1::aptos_coin::MintCapStore(?:<|$)/.test(resource.type)
+export const isMintCapStore = (resource: Types.MoveResource, ownerAddress?: string): resource is { type: string; data: MintCapStore } => {
+  const regexp = ownerAddress ? new RegExp(\`\${ownerAddress}::aptos_coin::MintCapStore(?:<|$)\`) : /^0x1::aptos_coin::MintCapStore(?:<|$)/
+  return regexp.test(resource.type)
+}
 
-export const extractAptosCoinTypeParameters = (type: string) => {
-  const result = /^0x1::aptos_coin::AptosCoin<(.*)>$/.exec(type)
+export const extractAptosCoinTypeParameters = (type: string, ownerAddress?: string) => {
+  const regexp = ownerAddress ? new RegExp(\`^\${ownerAddress}::aptos_coin::AptosCoin<(.*)>$\`) : /^0x1::aptos_coin::AptosCoin<(.*)>$/
+  const result = regexp.exec(type)
   return result && result[1]?.split(', ')
 }
 
-export const extractDelegationsTypeParameters = (type: string) => {
-  const result = /^0x1::aptos_coin::Delegations<(.*)>$/.exec(type)
+export const extractDelegationsTypeParameters = (type: string, ownerAddress?: string) => {
+  const regexp = ownerAddress ? new RegExp(\`^\${ownerAddress}::aptos_coin::Delegations<(.*)>$\`) : /^0x1::aptos_coin::Delegations<(.*)>$/
+  const result = regexp.exec(type)
   return result && result[1]?.split(', ')
 }
 
-export const extractMintCapStoreTypeParameters = (type: string) => {
-  const result = /^0x1::aptos_coin::MintCapStore<(.*)>$/.exec(type)
+export const extractMintCapStoreTypeParameters = (type: string, ownerAddress?: string) => {
+  const regexp = ownerAddress ? new RegExp(\`^\${ownerAddress}::aptos_coin::MintCapStore<(.*)>$\`) : /^0x1::aptos_coin::MintCapStore<(.*)>$/
+  const result = regexp.exec(type)
   return result && result[1]?.split(', ')
 }
 ",
@@ -617,38 +637,58 @@ export type VotingRecords = {
 import { Types } from 'aptos'
 import { ApprovedExecutionHashes, GovernanceConfig, GovernanceEvents, GovernanceResponsbility, VotingRecords } from './AptosGovernance'
 
-export const isApprovedExecutionHashes = (resource: Types.MoveResource): resource is { type: string; data: ApprovedExecutionHashes } => /^0x1::aptos_governance::ApprovedExecutionHashes(?:<|$)/.test(resource.type)
+export const isApprovedExecutionHashes = (resource: Types.MoveResource, ownerAddress?: string): resource is { type: string; data: ApprovedExecutionHashes } => {
+  const regexp = ownerAddress ? new RegExp(\`\${ownerAddress}::aptos_governance::ApprovedExecutionHashes(?:<|$)\`) : /^0x1::aptos_governance::ApprovedExecutionHashes(?:<|$)/
+  return regexp.test(resource.type)
+}
 
-export const isGovernanceConfig = (resource: Types.MoveResource): resource is { type: string; data: GovernanceConfig } => /^0x1::aptos_governance::GovernanceConfig(?:<|$)/.test(resource.type)
+export const isGovernanceConfig = (resource: Types.MoveResource, ownerAddress?: string): resource is { type: string; data: GovernanceConfig } => {
+  const regexp = ownerAddress ? new RegExp(\`\${ownerAddress}::aptos_governance::GovernanceConfig(?:<|$)\`) : /^0x1::aptos_governance::GovernanceConfig(?:<|$)/
+  return regexp.test(resource.type)
+}
 
-export const isGovernanceEvents = (resource: Types.MoveResource): resource is { type: string; data: GovernanceEvents } => /^0x1::aptos_governance::GovernanceEvents(?:<|$)/.test(resource.type)
+export const isGovernanceEvents = (resource: Types.MoveResource, ownerAddress?: string): resource is { type: string; data: GovernanceEvents } => {
+  const regexp = ownerAddress ? new RegExp(\`\${ownerAddress}::aptos_governance::GovernanceEvents(?:<|$)\`) : /^0x1::aptos_governance::GovernanceEvents(?:<|$)/
+  return regexp.test(resource.type)
+}
 
-export const isGovernanceResponsbility = (resource: Types.MoveResource): resource is { type: string; data: GovernanceResponsbility } => /^0x1::aptos_governance::GovernanceResponsbility(?:<|$)/.test(resource.type)
+export const isGovernanceResponsbility = (resource: Types.MoveResource, ownerAddress?: string): resource is { type: string; data: GovernanceResponsbility } => {
+  const regexp = ownerAddress ? new RegExp(\`\${ownerAddress}::aptos_governance::GovernanceResponsbility(?:<|$)\`) : /^0x1::aptos_governance::GovernanceResponsbility(?:<|$)/
+  return regexp.test(resource.type)
+}
 
-export const isVotingRecords = (resource: Types.MoveResource): resource is { type: string; data: VotingRecords } => /^0x1::aptos_governance::VotingRecords(?:<|$)/.test(resource.type)
+export const isVotingRecords = (resource: Types.MoveResource, ownerAddress?: string): resource is { type: string; data: VotingRecords } => {
+  const regexp = ownerAddress ? new RegExp(\`\${ownerAddress}::aptos_governance::VotingRecords(?:<|$)\`) : /^0x1::aptos_governance::VotingRecords(?:<|$)/
+  return regexp.test(resource.type)
+}
 
-export const extractApprovedExecutionHashesTypeParameters = (type: string) => {
-  const result = /^0x1::aptos_governance::ApprovedExecutionHashes<(.*)>$/.exec(type)
+export const extractApprovedExecutionHashesTypeParameters = (type: string, ownerAddress?: string) => {
+  const regexp = ownerAddress ? new RegExp(\`^\${ownerAddress}::aptos_governance::ApprovedExecutionHashes<(.*)>$\`) : /^0x1::aptos_governance::ApprovedExecutionHashes<(.*)>$/
+  const result = regexp.exec(type)
   return result && result[1]?.split(', ')
 }
 
-export const extractGovernanceConfigTypeParameters = (type: string) => {
-  const result = /^0x1::aptos_governance::GovernanceConfig<(.*)>$/.exec(type)
+export const extractGovernanceConfigTypeParameters = (type: string, ownerAddress?: string) => {
+  const regexp = ownerAddress ? new RegExp(\`^\${ownerAddress}::aptos_governance::GovernanceConfig<(.*)>$\`) : /^0x1::aptos_governance::GovernanceConfig<(.*)>$/
+  const result = regexp.exec(type)
   return result && result[1]?.split(', ')
 }
 
-export const extractGovernanceEventsTypeParameters = (type: string) => {
-  const result = /^0x1::aptos_governance::GovernanceEvents<(.*)>$/.exec(type)
+export const extractGovernanceEventsTypeParameters = (type: string, ownerAddress?: string) => {
+  const regexp = ownerAddress ? new RegExp(\`^\${ownerAddress}::aptos_governance::GovernanceEvents<(.*)>$\`) : /^0x1::aptos_governance::GovernanceEvents<(.*)>$/
+  const result = regexp.exec(type)
   return result && result[1]?.split(', ')
 }
 
-export const extractGovernanceResponsbilityTypeParameters = (type: string) => {
-  const result = /^0x1::aptos_governance::GovernanceResponsbility<(.*)>$/.exec(type)
+export const extractGovernanceResponsbilityTypeParameters = (type: string, ownerAddress?: string) => {
+  const regexp = ownerAddress ? new RegExp(\`^\${ownerAddress}::aptos_governance::GovernanceResponsbility<(.*)>$\`) : /^0x1::aptos_governance::GovernanceResponsbility<(.*)>$/
+  const result = regexp.exec(type)
   return result && result[1]?.split(', ')
 }
 
-export const extractVotingRecordsTypeParameters = (type: string) => {
-  const result = /^0x1::aptos_governance::VotingRecords<(.*)>$/.exec(type)
+export const extractVotingRecordsTypeParameters = (type: string, ownerAddress?: string) => {
+  const regexp = ownerAddress ? new RegExp(\`^\${ownerAddress}::aptos_governance::VotingRecords<(.*)>$\`) : /^0x1::aptos_governance::VotingRecords<(.*)>$/
+  const result = regexp.exec(type)
   return result && result[1]?.split(', ')
 }
 ",
@@ -1377,24 +1417,36 @@ export type WithdrawEvent = {
 import { Types } from 'aptos'
 import { CoinInfo, CoinStore, SupplyConfig } from './Coin'
 
-export const isCoinInfo = (resource: Types.MoveResource): resource is { type: string; data: CoinInfo } => /^0x1::coin::CoinInfo(?:<|$)/.test(resource.type)
+export const isCoinInfo = (resource: Types.MoveResource, ownerAddress?: string): resource is { type: string; data: CoinInfo } => {
+  const regexp = ownerAddress ? new RegExp(\`\${ownerAddress}::coin::CoinInfo(?:<|$)\`) : /^0x1::coin::CoinInfo(?:<|$)/
+  return regexp.test(resource.type)
+}
 
-export const isCoinStore = (resource: Types.MoveResource): resource is { type: string; data: CoinStore } => /^0x1::coin::CoinStore(?:<|$)/.test(resource.type)
+export const isCoinStore = (resource: Types.MoveResource, ownerAddress?: string): resource is { type: string; data: CoinStore } => {
+  const regexp = ownerAddress ? new RegExp(\`\${ownerAddress}::coin::CoinStore(?:<|$)\`) : /^0x1::coin::CoinStore(?:<|$)/
+  return regexp.test(resource.type)
+}
 
-export const isSupplyConfig = (resource: Types.MoveResource): resource is { type: string; data: SupplyConfig } => /^0x1::coin::SupplyConfig(?:<|$)/.test(resource.type)
+export const isSupplyConfig = (resource: Types.MoveResource, ownerAddress?: string): resource is { type: string; data: SupplyConfig } => {
+  const regexp = ownerAddress ? new RegExp(\`\${ownerAddress}::coin::SupplyConfig(?:<|$)\`) : /^0x1::coin::SupplyConfig(?:<|$)/
+  return regexp.test(resource.type)
+}
 
-export const extractCoinInfoTypeParameters = (type: string) => {
-  const result = /^0x1::coin::CoinInfo<(.*)>$/.exec(type)
+export const extractCoinInfoTypeParameters = (type: string, ownerAddress?: string) => {
+  const regexp = ownerAddress ? new RegExp(\`^\${ownerAddress}::coin::CoinInfo<(.*)>$\`) : /^0x1::coin::CoinInfo<(.*)>$/
+  const result = regexp.exec(type)
   return result && result[1]?.split(', ')
 }
 
-export const extractCoinStoreTypeParameters = (type: string) => {
-  const result = /^0x1::coin::CoinStore<(.*)>$/.exec(type)
+export const extractCoinStoreTypeParameters = (type: string, ownerAddress?: string) => {
+  const regexp = ownerAddress ? new RegExp(\`^\${ownerAddress}::coin::CoinStore<(.*)>$\`) : /^0x1::coin::CoinStore<(.*)>$/
+  const result = regexp.exec(type)
   return result && result[1]?.split(', ')
 }
 
-export const extractSupplyConfigTypeParameters = (type: string) => {
-  const result = /^0x1::coin::SupplyConfig<(.*)>$/.exec(type)
+export const extractSupplyConfigTypeParameters = (type: string, ownerAddress?: string) => {
+  const regexp = ownerAddress ? new RegExp(\`^\${ownerAddress}::coin::SupplyConfig<(.*)>$\`) : /^0x1::coin::SupplyConfig<(.*)>$/
+  const result = regexp.exec(type)
   return result && result[1]?.split(', ')
 }
 ",
@@ -2268,24 +2320,36 @@ export type WithdrawEvent = {
 import { Types } from 'aptos'
 import { Pool, PoolEventHandle, Storage } from './Pool'
 
-export const isPool = (resource: Types.MoveResource): resource is { type: string; data: Pool } => /^0x3b6e641ab8f8efad88169e44597b9c6822a158a5292a7aa7c0b41cf821603bd9::pool::Pool(?:<|$)/.test(resource.type)
+export const isPool = (resource: Types.MoveResource, ownerAddress?: string): resource is { type: string; data: Pool } => {
+  const regexp = ownerAddress ? new RegExp(\`\${ownerAddress}::pool::Pool(?:<|$)\`) : /^0x3b6e641ab8f8efad88169e44597b9c6822a158a5292a7aa7c0b41cf821603bd9::pool::Pool(?:<|$)/
+  return regexp.test(resource.type)
+}
 
-export const isPoolEventHandle = (resource: Types.MoveResource): resource is { type: string; data: PoolEventHandle } => /^0x3b6e641ab8f8efad88169e44597b9c6822a158a5292a7aa7c0b41cf821603bd9::pool::PoolEventHandle(?:<|$)/.test(resource.type)
+export const isPoolEventHandle = (resource: Types.MoveResource, ownerAddress?: string): resource is { type: string; data: PoolEventHandle } => {
+  const regexp = ownerAddress ? new RegExp(\`\${ownerAddress}::pool::PoolEventHandle(?:<|$)\`) : /^0x3b6e641ab8f8efad88169e44597b9c6822a158a5292a7aa7c0b41cf821603bd9::pool::PoolEventHandle(?:<|$)/
+  return regexp.test(resource.type)
+}
 
-export const isStorage = (resource: Types.MoveResource): resource is { type: string; data: Storage } => /^0x3b6e641ab8f8efad88169e44597b9c6822a158a5292a7aa7c0b41cf821603bd9::pool::Storage(?:<|$)/.test(resource.type)
+export const isStorage = (resource: Types.MoveResource, ownerAddress?: string): resource is { type: string; data: Storage } => {
+  const regexp = ownerAddress ? new RegExp(\`\${ownerAddress}::pool::Storage(?:<|$)\`) : /^0x3b6e641ab8f8efad88169e44597b9c6822a158a5292a7aa7c0b41cf821603bd9::pool::Storage(?:<|$)/
+  return regexp.test(resource.type)
+}
 
-export const extractPoolTypeParameters = (type: string) => {
-  const result = /^0x3b6e641ab8f8efad88169e44597b9c6822a158a5292a7aa7c0b41cf821603bd9::pool::Pool<(.*)>$/.exec(type)
+export const extractPoolTypeParameters = (type: string, ownerAddress?: string) => {
+  const regexp = ownerAddress ? new RegExp(\`^\${ownerAddress}::pool::Pool<(.*)>$\`) : /^0x3b6e641ab8f8efad88169e44597b9c6822a158a5292a7aa7c0b41cf821603bd9::pool::Pool<(.*)>$/
+  const result = regexp.exec(type)
   return result && result[1]?.split(', ')
 }
 
-export const extractPoolEventHandleTypeParameters = (type: string) => {
-  const result = /^0x3b6e641ab8f8efad88169e44597b9c6822a158a5292a7aa7c0b41cf821603bd9::pool::PoolEventHandle<(.*)>$/.exec(type)
+export const extractPoolEventHandleTypeParameters = (type: string, ownerAddress?: string) => {
+  const regexp = ownerAddress ? new RegExp(\`^\${ownerAddress}::pool::PoolEventHandle<(.*)>$\`) : /^0x3b6e641ab8f8efad88169e44597b9c6822a158a5292a7aa7c0b41cf821603bd9::pool::PoolEventHandle<(.*)>$/
+  const result = regexp.exec(type)
   return result && result[1]?.split(', ')
 }
 
-export const extractStorageTypeParameters = (type: string) => {
-  const result = /^0x3b6e641ab8f8efad88169e44597b9c6822a158a5292a7aa7c0b41cf821603bd9::pool::Storage<(.*)>$/.exec(type)
+export const extractStorageTypeParameters = (type: string, ownerAddress?: string) => {
+  const regexp = ownerAddress ? new RegExp(\`^\${ownerAddress}::pool::Storage<(.*)>$\`) : /^0x3b6e641ab8f8efad88169e44597b9c6822a158a5292a7aa7c0b41cf821603bd9::pool::Storage<(.*)>$/
+  const result = regexp.exec(type)
   return result && result[1]?.split(', ')
 }
 ",
@@ -2341,10 +2405,14 @@ export type Table = {
 import { Types } from 'aptos'
 import { Box } from './Table'
 
-export const isBox = <T0>(resource: Types.MoveResource): resource is { type: string; data: Box<T0> } => /^0x1::table::Box(?:<|$)/.test(resource.type)
+export const isBox = <T0>(resource: Types.MoveResource, ownerAddress?: string): resource is { type: string; data: Box<T0> } => {
+  const regexp = ownerAddress ? new RegExp(\`\${ownerAddress}::table::Box(?:<|$)\`) : /^0x1::table::Box(?:<|$)/
+  return regexp.test(resource.type)
+}
 
-export const extractBoxTypeParameters = (type: string) => {
-  const result = /^0x1::table::Box<(.*)>$/.exec(type)
+export const extractBoxTypeParameters = (type: string, ownerAddress?: string) => {
+  const regexp = ownerAddress ? new RegExp(\`^\${ownerAddress}::table::Box<(.*)>$\`) : /^0x1::table::Box<(.*)>$/
+  const result = regexp.exec(type)
   return result && result[1]?.split(', ')
 }
 ",

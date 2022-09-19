@@ -144,30 +144,38 @@ ${utilitiesContents.join('\n')}
 
 export const resourceTypeGuard = ({
   moduleId,
+  moduleName,
   name,
   typeParameters,
 }: {
   moduleId: string
+  moduleName: string
   name: string
   typeParameters: string[] | undefined
 }) =>
   `
 export const is${name} = ${genericType(
     typeParameters,
-  )}(resource: Types.MoveResource): resource is { type: string; data: ${name}${genericType(
+  )}(resource: Types.MoveResource, ownerAddress?: string): resource is { type: string; data: ${name}${genericType(
     typeParameters,
-  )} } => /^${moduleId}::${name}(?:<|$)/.test(resource.type)`
+  )} } => {
+  const regexp = ownerAddress ? new RegExp(\`\${ownerAddress}::${moduleName}::${name}(?:<|$)\`) : /^${moduleId}::${name}(?:<|$)/
+  return regexp.test(resource.type)
+}`
 
 export const typeParametersExtaractor = ({
   moduleId,
+  moduleName,
   name,
 }: {
   moduleId: string
+  moduleName: string
   name: string
 }) =>
   `
-export const extract${name}TypeParameters = (type: string) => {
-  const result = /^${moduleId}::${name}<(.*)>$/.exec(type)
+export const extract${name}TypeParameters = (type: string, ownerAddress?: string) => {
+  const regexp = ownerAddress ? new RegExp(\`^\${ownerAddress}::${moduleName}::${name}<(.*)>$\`) : /^${moduleId}::${name}<(.*)>$/
+  const result = regexp.exec(type)
   return result && result[1]?.split(', ')
 }`
 

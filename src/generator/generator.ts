@@ -61,12 +61,17 @@ const generateUtilities = ({ module, resolver }: GeneratorParams) => {
     const structDef = resolver.getStructDefinition(module.id, name)
     return resourceTypeGuard({
       moduleId: module.id,
+      moduleName: module.abi.name,
       name,
       typeParameters: structDef.typeParameters,
     })
   })
   const typeParametersExtaractors = module.resources.map(({ name }) =>
-    typeParametersExtaractor({ moduleId: module.id, name }),
+    typeParametersExtaractor({
+      moduleId: module.id,
+      moduleName: module.abi.name,
+      name,
+    }),
   )
   return utilities({
     moduleName: module.name,
