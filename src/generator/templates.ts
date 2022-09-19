@@ -14,8 +14,8 @@ const _abi: MoveModuleJSON = ${JSON.stringify(abi, undefined, 2)}
   
 export class ${name}ModuleFactory {
   static readonly abi = _abi
-  static connect = (signerOrClient: SignerOrClient) => {
-    return new AptosModuleClient(_abi, signerOrClient) as ${name}Module
+  static connect = (signerOrClient: SignerOrClient, address?: string) => {
+    return new AptosModuleClient(_abi, signerOrClient, address) as ${name}Module
   }
 }
 `

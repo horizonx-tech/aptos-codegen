@@ -546,8 +546,8 @@ const _abi: MoveModuleJSON = {
   
 export class AptosGovernanceModuleFactory {
   static readonly abi = _abi
-  static connect = (signerOrClient: SignerOrClient) => {
-    return new AptosModuleClient(_abi, signerOrClient) as AptosGovernanceModule
+  static connect = (signerOrClient: SignerOrClient, address?: string) => {
+    return new AptosModuleClient(_abi, signerOrClient, address) as AptosGovernanceModule
   }
 }
 ",
@@ -1338,8 +1338,8 @@ const _abi: MoveModuleJSON = {
   
 export class CoinModuleFactory {
   static readonly abi = _abi
-  static connect = (signerOrClient: SignerOrClient) => {
-    return new AptosModuleClient(_abi, signerOrClient) as CoinModule
+  static connect = (signerOrClient: SignerOrClient, address?: string) => {
+    return new AptosModuleClient(_abi, signerOrClient, address) as CoinModule
   }
 }
 ",
@@ -2206,8 +2206,8 @@ const _abi: MoveModuleJSON = {
   
 export class PoolModuleFactory {
   static readonly abi = _abi
-  static connect = (signerOrClient: SignerOrClient) => {
-    return new AptosModuleClient(_abi, signerOrClient) as PoolModule
+  static connect = (signerOrClient: SignerOrClient, address?: string) => {
+    return new AptosModuleClient(_abi, signerOrClient, address) as PoolModule
   }
 }
 ",
