@@ -304,10 +304,10 @@
   dependencies:
     "@jridgewell/trace-mapping" "0.3.9"
 
-"@horizonx/aptos-module-client@^0.1.0":
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/@horizonx/aptos-module-client/-/aptos-module-client-0.1.0.tgz#42287278c0004ee8be57929898d0e70247112675"
-  integrity sha512-x50X+eIlD/Pn7K9ai0VV56oB4NKckoQsviFhKCbamdbr8alBYDje9SKXKEDUPyPJDO14I+16mQZDHn4OkzIxbQ==
+"@horizonx/aptos-module-client@^0.2.0":
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/@horizonx/aptos-module-client/-/aptos-module-client-0.2.0.tgz#f13f5ce39c94f52514b78bbc50706a9786db5628"
+  integrity sha512-6dKq+xM5eInYefU516v20Lw4Kbj6kendUsYAZNeaPJzNpHhpohuLNMmtdMW6HdAECKUXjnK/AgH8ZIOKEYzPlg==
   dependencies:
     aptos "^1.3.7"
     change-case "^4.1.2"
