@@ -1,8 +1,18 @@
 {
   "name": "@horizonx/aptos-codegen",
+  "description": "Generate interface for aptos modules from ABI",
+  "keywords": [
+    "aptos",
+    "TypeScript"
+  ],
   "version": "0.5.1",
   "author": "HorizonX",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/horizonx-tech/aptos-codegen.git"
+  },
+  "homepage": "https://github.com/horizonx-tech/aptos-codegen#readme",
   "bin": {
     "aptos-codegen": "dist/cli/index.js"
   },
