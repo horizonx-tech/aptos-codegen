@@ -1,4 +1,5 @@
 import { MoveModuleJSON } from '@horizonx/aptos-module-client'
+import { FunctionStruct } from 'src/types'
 
 export const factory = ({
   name,
@@ -60,21 +61,18 @@ const moduleType = ({
 `
     : ''
 
-export const entryFunction = ({
-  name,
-  params,
-}: {
-  name: string
-  params: string[]
-}) => {
-  const noParam = params.length === 0
+export const entryFunction = (fn: FunctionStruct) => {
   const args = [
-    'type_arguments?: string[]',
-    noParam ? undefined : `arguments: [${params.join(', ')}]`,
+    fn.typeArguments.length === 0
+      ? undefined
+      : `type_arguments: [${fn.typeArguments.map(() => 'string').join(', ')}]`,
+    fn.args.length === 0 ? undefined : `arguments: [${fn.args.join(', ')}]`,
   ]
     .filter(Boolean)
     .join(', ')
-  return `${name}: (args${noParam ? '?' : ''}: { ${args} }) => Promise<void>`
+  return `${fn.name}: (${
+    args.length ? `payload: { ${args} }` : ''
+  }) => Promise<void>`
 }
 
 export const resourceGetter = ({

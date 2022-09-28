@@ -18,7 +18,9 @@ export type EventHandleTypeStruct = {
 
 export type FunctionStruct = {
   name: string
-  // type_arguments: string[]
+  typeArguments: {
+    constraints: string[]
+  }[]
   args: TypeStruct[]
 }
 

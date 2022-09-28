@@ -27,8 +27,9 @@ export const parseFromABI = (abi: MoveModuleJSON): ModuleStruct => {
 
   const entryFunctions = abi.exposed_functions
     .filter(({ is_entry }) => is_entry)
-    .map(({ name, params }) => ({
+    .map(({ name, generic_type_params, params }) => ({
       name,
+      typeArguments: generic_type_params,
       args: params.filter(notSigner).map(toTypeStruct),
     }))
 

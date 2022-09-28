@@ -74,6 +74,7 @@ const generateUtilities = ({ module, resolver }: GeneratorParams) => {
     }),
   )
   return utilities({
+    address: module.address,
     moduleName: module.name,
     resourceNames: module.resources.map(({ name }) => name),
     utilitiesContents: [...resourceTypeGuards, ...typeParametersExtaractors],
@@ -89,11 +90,13 @@ const generateTypes = (params: GeneratorParams) => {
 }
 
 const generateTypesContent = ({ module, resolver }: GeneratorParams) => {
-  const entryFunctions = module.entryFunctions.map(({ name, args }) =>
-    entryFunction({
-      name,
-      params: args.map((type) => toTypeName(type, resolver)),
-    }),
+  const entryFunctions = module.entryFunctions.map(
+    ({ name, typeArguments, args }) =>
+      entryFunction({
+        name,
+        typeArguments,
+        args: args.map((type) => toTypeName(type, resolver)),
+      }),
   )
 
   const resourceGetters = module.resources.map(({ name }) => {
