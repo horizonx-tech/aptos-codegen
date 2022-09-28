@@ -70,8 +70,9 @@ export const entryFunction = (fn: FunctionStruct) => {
   ]
     .filter(Boolean)
     .join(', ')
+  const options = `options?: Partial<Types.SubmitTransactionRequest>`
   return `${fn.name}: (${
-    args.length ? `payload: { ${args} }` : ''
+    args.length ? `payload: { ${args} }, ${options}` : options
   }) => Promise<void>`
 }
 

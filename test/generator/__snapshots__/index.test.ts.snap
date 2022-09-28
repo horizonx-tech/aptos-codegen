@@ -16,9 +16,9 @@ import { Table } from './Table'
 import { AptosModuleClient, EventGetterParams, TypedEvent, TypedMoveResource } from '@horizonx/aptos-module-client'
 
 export interface AccountModule extends AptosModuleClient  {
-  offer_signer_capability: (payload: { arguments: [Array<BCS.Uint8>, BCS.Uint8, Array<BCS.Uint8>, MaybeHexString] }) => Promise<void>
-  revoke_signer_capability: (payload: { arguments: [MaybeHexString] }) => Promise<void>
-  rotate_authentication_key: (payload: { arguments: [BCS.Uint8, Array<BCS.Uint8>, BCS.Uint8, Array<BCS.Uint8>, Array<BCS.Uint8>, Array<BCS.Uint8>] }) => Promise<void>
+  offer_signer_capability: (payload: { arguments: [Array<BCS.Uint8>, BCS.Uint8, Array<BCS.Uint8>, MaybeHexString] }, options?: Partial<Types.SubmitTransactionRequest>) => Promise<void>
+  revoke_signer_capability: (payload: { arguments: [MaybeHexString] }, options?: Partial<Types.SubmitTransactionRequest>) => Promise<void>
+  rotate_authentication_key: (payload: { arguments: [BCS.Uint8, Array<BCS.Uint8>, BCS.Uint8, Array<BCS.Uint8>, Array<BCS.Uint8>, Array<BCS.Uint8>] }, options?: Partial<Types.SubmitTransactionRequest>) => Promise<void>
   getAccount: (owner: MaybeHexString, typeParameter?: string) => Promise<TypedMoveResource<Account>>
   getOriginatingAddress: (owner: MaybeHexString, typeParameter?: string) => Promise<TypedMoveResource<OriginatingAddress>>
   getCoinRegisterEvents: (address: MaybeHexString, typeParameter?: string) => Promise<TypedEvent<CoinRegisterEvent>>
@@ -148,9 +148,9 @@ import { MintCapability } from './Coin'
 import { AptosModuleClient, TypedMoveResource } from '@horizonx/aptos-module-client'
 
 export interface AptosCoinModule extends AptosModuleClient  {
-  claim_mint_capability: () => Promise<void>
-  delegate_mint_capability: (payload: { arguments: [any, MaybeHexString] }) => Promise<void>
-  mint: (payload: { arguments: [MaybeHexString, BCS.Uint64] }) => Promise<void>
+  claim_mint_capability: (options?: Partial<Types.SubmitTransactionRequest>) => Promise<void>
+  delegate_mint_capability: (payload: { arguments: [any, MaybeHexString] }, options?: Partial<Types.SubmitTransactionRequest>) => Promise<void>
+  mint: (payload: { arguments: [MaybeHexString, BCS.Uint64] }, options?: Partial<Types.SubmitTransactionRequest>) => Promise<void>
   getAptosCoin: (owner: MaybeHexString, typeParameter?: string) => Promise<TypedMoveResource<AptosCoin>>
   getDelegations: (owner: MaybeHexString, typeParameter?: string) => Promise<TypedMoveResource<Delegations>>
   getMintCapStore: (owner: MaybeHexString, typeParameter?: string) => Promise<TypedMoveResource<MintCapStore>>
@@ -580,8 +580,8 @@ import { Table } from './Table'
 import { AptosModuleClient, EventGetterParams, TypedEvent, TypedMoveResource } from '@horizonx/aptos-module-client'
 
 export interface AptosGovernanceModule extends AptosModuleClient  {
-  create_proposal: (payload: { arguments: [MaybeHexString, Array<BCS.Uint8>, Array<BCS.Uint8>, Array<BCS.Uint8>] }) => Promise<void>
-  vote: (payload: { arguments: [MaybeHexString, BCS.Uint64, boolean] }) => Promise<void>
+  create_proposal: (payload: { arguments: [MaybeHexString, Array<BCS.Uint8>, Array<BCS.Uint8>, Array<BCS.Uint8>] }, options?: Partial<Types.SubmitTransactionRequest>) => Promise<void>
+  vote: (payload: { arguments: [MaybeHexString, BCS.Uint64, boolean] }, options?: Partial<Types.SubmitTransactionRequest>) => Promise<void>
   getApprovedExecutionHashes: (owner: MaybeHexString, typeParameter?: string) => Promise<TypedMoveResource<ApprovedExecutionHashes>>
   getGovernanceConfig: (owner: MaybeHexString, typeParameter?: string) => Promise<TypedMoveResource<GovernanceConfig>>
   getGovernanceEvents: (owner: MaybeHexString, typeParameter?: string) => Promise<TypedMoveResource<GovernanceEvents>>
@@ -1376,9 +1376,9 @@ import { EventHandle } from './Event'
 import { AptosModuleClient, EventGetterParams, TypedEvent, TypedMoveResource } from '@horizonx/aptos-module-client'
 
 export interface CoinModule extends AptosModuleClient  {
-  freeze_coin_store: (payload: { type_arguments: [string], arguments: [MaybeHexString, any] }) => Promise<void>
-  transfer: (payload: { type_arguments: [string], arguments: [MaybeHexString, BCS.Uint64] }) => Promise<void>
-  upgrade_supply: (payload: { type_arguments: [string] }) => Promise<void>
+  freeze_coin_store: (payload: { type_arguments: [string], arguments: [MaybeHexString, any] }, options?: Partial<Types.SubmitTransactionRequest>) => Promise<void>
+  transfer: (payload: { type_arguments: [string], arguments: [MaybeHexString, BCS.Uint64] }, options?: Partial<Types.SubmitTransactionRequest>) => Promise<void>
+  upgrade_supply: (payload: { type_arguments: [string] }, options?: Partial<Types.SubmitTransactionRequest>) => Promise<void>
   getCoinInfo: (owner: MaybeHexString, typeParameter?: string) => Promise<TypedMoveResource<CoinInfo>>
   getCoinStore: (owner: MaybeHexString, typeParameter?: string) => Promise<TypedMoveResource<CoinStore>>
   getSupplyConfig: (owner: MaybeHexString, typeParameter?: string) => Promise<TypedMoveResource<SupplyConfig>>
@@ -2251,25 +2251,25 @@ import { EventHandle } from './Event'
 import { AptosModuleClient, EventGetterParams, TypedEvent, TypedMoveResource } from '@horizonx/aptos-module-client'
 
 export interface PoolModule extends AptosModuleClient  {
-  borrow: (payload: { type_arguments: [string], arguments: [BCS.Uint64, boolean] }) => Promise<void>
-  borrow_for: (payload: { type_arguments: [string], arguments: [MaybeHexString, MaybeHexString, BCS.Uint64, boolean] }) => Promise<void>
-  collateral_value: (payload: { type_arguments: [string, string] }) => Promise<void>
-  debt_value: (payload: { type_arguments: [string, string] }) => Promise<void>
-  deposit: (payload: { type_arguments: [string], arguments: [BCS.Uint64, boolean, boolean] }) => Promise<void>
-  deposit_for: (payload: { type_arguments: [string], arguments: [MaybeHexString, BCS.Uint64, boolean, boolean] }) => Promise<void>
-  init_pool: (payload: { type_arguments: [string] }) => Promise<void>
-  is_asset_solvent: (payload: { type_arguments: [string], arguments: [MaybeHexString] }) => Promise<void>
-  is_shadow_solvent: (payload: { type_arguments: [string], arguments: [MaybeHexString] }) => Promise<void>
-  last_updated: (payload: { type_arguments: [string, string] }) => Promise<void>
-  liquidate: (payload: { type_arguments: [string], arguments: [MaybeHexString, boolean] }) => Promise<void>
-  liquidity: (payload: { type_arguments: [string, string] }) => Promise<void>
-  repay: (payload: { type_arguments: [string], arguments: [BCS.Uint64, boolean] }) => Promise<void>
-  total_borrows: (payload: { type_arguments: [string, string] }) => Promise<void>
-  total_conly_deposits: (payload: { type_arguments: [string, string] }) => Promise<void>
-  total_deposits: (payload: { type_arguments: [string, string] }) => Promise<void>
-  update_status: (payload: { type_arguments: [string], arguments: [boolean] }) => Promise<void>
-  withdraw: (payload: { type_arguments: [string], arguments: [BCS.Uint64, boolean, boolean] }) => Promise<void>
-  withdraw_for: (payload: { type_arguments: [string], arguments: [MaybeHexString, BCS.Uint64, boolean, boolean] }) => Promise<void>
+  borrow: (payload: { type_arguments: [string], arguments: [BCS.Uint64, boolean] }, options?: Partial<Types.SubmitTransactionRequest>) => Promise<void>
+  borrow_for: (payload: { type_arguments: [string], arguments: [MaybeHexString, MaybeHexString, BCS.Uint64, boolean] }, options?: Partial<Types.SubmitTransactionRequest>) => Promise<void>
+  collateral_value: (payload: { type_arguments: [string, string] }, options?: Partial<Types.SubmitTransactionRequest>) => Promise<void>
+  debt_value: (payload: { type_arguments: [string, string] }, options?: Partial<Types.SubmitTransactionRequest>) => Promise<void>
+  deposit: (payload: { type_arguments: [string], arguments: [BCS.Uint64, boolean, boolean] }, options?: Partial<Types.SubmitTransactionRequest>) => Promise<void>
+  deposit_for: (payload: { type_arguments: [string], arguments: [MaybeHexString, BCS.Uint64, boolean, boolean] }, options?: Partial<Types.SubmitTransactionRequest>) => Promise<void>
+  init_pool: (payload: { type_arguments: [string] }, options?: Partial<Types.SubmitTransactionRequest>) => Promise<void>
+  is_asset_solvent: (payload: { type_arguments: [string], arguments: [MaybeHexString] }, options?: Partial<Types.SubmitTransactionRequest>) => Promise<void>
+  is_shadow_solvent: (payload: { type_arguments: [string], arguments: [MaybeHexString] }, options?: Partial<Types.SubmitTransactionRequest>) => Promise<void>
+  last_updated: (payload: { type_arguments: [string, string] }, options?: Partial<Types.SubmitTransactionRequest>) => Promise<void>
+  liquidate: (payload: { type_arguments: [string], arguments: [MaybeHexString, boolean] }, options?: Partial<Types.SubmitTransactionRequest>) => Promise<void>
+  liquidity: (payload: { type_arguments: [string, string] }, options?: Partial<Types.SubmitTransactionRequest>) => Promise<void>
+  repay: (payload: { type_arguments: [string], arguments: [BCS.Uint64, boolean] }, options?: Partial<Types.SubmitTransactionRequest>) => Promise<void>
+  total_borrows: (payload: { type_arguments: [string, string] }, options?: Partial<Types.SubmitTransactionRequest>) => Promise<void>
+  total_conly_deposits: (payload: { type_arguments: [string, string] }, options?: Partial<Types.SubmitTransactionRequest>) => Promise<void>
+  total_deposits: (payload: { type_arguments: [string, string] }, options?: Partial<Types.SubmitTransactionRequest>) => Promise<void>
+  update_status: (payload: { type_arguments: [string], arguments: [boolean] }, options?: Partial<Types.SubmitTransactionRequest>) => Promise<void>
+  withdraw: (payload: { type_arguments: [string], arguments: [BCS.Uint64, boolean, boolean] }, options?: Partial<Types.SubmitTransactionRequest>) => Promise<void>
+  withdraw_for: (payload: { type_arguments: [string], arguments: [MaybeHexString, BCS.Uint64, boolean, boolean] }, options?: Partial<Types.SubmitTransactionRequest>) => Promise<void>
   getPool: (owner: MaybeHexString, typeParameter?: string) => Promise<TypedMoveResource<Pool>>
   getPoolEventHandle: (owner: MaybeHexString, typeParameter?: string) => Promise<TypedMoveResource<PoolEventHandle>>
   getStorage: (owner: MaybeHexString, typeParameter?: string) => Promise<TypedMoveResource<Storage>>

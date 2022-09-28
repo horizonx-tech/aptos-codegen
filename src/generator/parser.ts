@@ -85,7 +85,9 @@ export const extractDependencies = (
   ]
   const additionalDependencies = [
     ...(resources.length ? ['address', 'TypedMoveResource', 'Types'] : []),
-    ...(entryFunctions.length || resources.length ? ['AptosModuleClient'] : []),
+    ...(entryFunctions.length || resources.length
+      ? ['AptosModuleClient', 'Types']
+      : []),
     ...(events.length ? ['TypedEvent', 'EventGetterParams'] : []),
   ]
   return Array.from(

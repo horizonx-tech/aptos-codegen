@@ -126,7 +126,11 @@ describe('parser', () => {
     it('can extract types from entryFunctions and structs except self-defined types', () => {
       const moduleId = '0x::coin'
       const entryFunctions: FunctionStruct[] = [
-        { name: '0x1::coin::transfer', args: ['address', 'u64'] },
+        {
+          name: '0x1::coin::transfer',
+          typeArguments: [],
+          args: ['address', 'u64'],
+        },
       ]
       const resources: ResourceStruct[] = []
       const events: EventStruct[] = []
@@ -158,6 +162,7 @@ describe('parser', () => {
         '0x1::option::Option',
         'u8',
         'AptosModuleClient',
+        'Types',
       ])
     })
     it('add "address" and "TypedMoveResource" and "Types" if resources is not empty', () => {
@@ -196,17 +201,17 @@ describe('parser', () => {
       ])
       expect(extractDependencies(moduleId, [], [], [], [])).toHaveLength(0)
     })
-    it('add "AptosModuleClient" if entryFunctions or resources are not empty', () => {
+    it('add "AptosModuleClient" and "Types" if entryFunctions or resources are not empty', () => {
       const moduleId = '0x::example'
       const entryFunctions: FunctionStruct[] = [
-        { name: '0x1::example::example', args: [] },
+        { name: '0x1::example::example', typeArguments: [], args: [] },
       ]
       const resources: ResourceStruct[] = [{ name: '0x1::example::Example' }]
       const structs: StructStruct[] = []
 
       expect(
         extractDependencies(moduleId, entryFunctions, [], [], structs),
-      ).toEqual(['AptosModuleClient'])
+      ).toEqual(['AptosModuleClient', 'Types'])
       expect(extractDependencies(moduleId, [], resources, [], structs)).toEqual(
         ['address', 'TypedMoveResource', 'Types', 'AptosModuleClient'],
       )
@@ -217,6 +222,7 @@ describe('parser', () => {
       const entryFunctions: FunctionStruct[] = [
         {
           name: '0x1::example::example',
+          typeArguments: [],
           args: [
             'bool',
             { name: 'vector', genericTypes: ['u8'] },
@@ -225,7 +231,7 @@ describe('parser', () => {
         },
       ]
       expect(extractDependencies(moduleId, entryFunctions, [], [], [])).toEqual(
-        ['u8', 'AptosModuleClient'],
+        ['u8', 'AptosModuleClient', 'Types'],
       )
     })
   })
