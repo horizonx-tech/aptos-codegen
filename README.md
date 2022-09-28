@@ -57,13 +57,13 @@ aptos-codegen -c {configuration-file}
 
 #### Options
 
-| Option(\*Required) | Description                                      | Examples                                   |
-| ------------------ | ------------------------------------------------ | ------------------------------------------ |
-| `-m`\*             | Module identifier(s).                            | `0x1::coin`, `0x1::coin 0x1::account`      |
-| `-o`\*             | Output geeerated code to this directory.         | `__generated__`                            |
-| `-u`\*             | Aptos node URL.                                  | `https://fullnode.devnet.aptoslabs.com/v1` |
-| `-f`               | ABI file path pattern(s) (glob). (\*1)           | `abi/**/*.json`                            |
-| `-c`               | Read options from this configuration file. (\*2) | `./aptos-codegen.json`                     |
+| Option(\*Required) | Description                                      | Examples                                               |
+| ------------------ | ------------------------------------------------ | ------------------------------------------------------ |
+| `-m`\*             | Module identifier(s).                            | `0x1::coin`, `0x1::coin 0x1::account`                  |
+| `-o`\*             | Output generated code to this directory.         | `__generated__`                                        |
+| `-u`\*             | Aptos node URL.                                  | `https://fullnode.devnet.aptoslabs.com/v1`             |
+| `-f`               | ABI file path pattern(s) (glob). (\*1)           | `abi/**/*.json`                                        |
+| `-c`               | Read options from this configuration file. (\*2) | `./aptos-codegen.json` ([example](aptos-codegen.json)) |
 
 \*1: ABIs loaded from files are referenced in preference to those loaded from the chain.
 
@@ -82,4 +82,39 @@ You can use [aptos-wallet-connector](https://github.com/horizonx-tech/aptos-wall
 import { CoinModuleFactory } from './__generated__/CoinModuleFactory'
 
 const coin = CoinModuleFactory.connect(signerOrClient)
+
+// You can overwrite address of module
+const coin = CoinModuleFactory.connect(signerOrClient, "0xAnotherAddress")
+```
+
+### utils
+
+| Function                 | Description                                         | Arguments                 |
+| ------------------------ | --------------------------------------------------- | ------------------------- |
+| isXXX                    | a type guard of the resource                        | `resource`: MoveResource  |
+| extractXXXTypeParameters | extract type parameters string of the resource type | `type`: MoveResource.type |
+
+
+```typescript
+import { Types } from 'aptos'
+import { CoinUtils } from './__generated__/CoinUtils'
+
+const coinUtils = new CoinUtils() // or new CoinUtils("0xAnotherAddress")
+
+const resources: Types.MoveResource[] = [
+  { type: "0x1::coin::CoinInfo<0x123456::coin::CoinA>", data: { symbol: "CoinA", ...} },
+  { type: "0x1::coin::CoinInfo<0x123456::coin::CoinB>", data: { symbol: "CoinB", ...} },
+  { type: "0x123456::type::SomeType", data: {...} },
+  ...
+]
+
+if (coinUtils.isCoinInfo(resources[0])) {
+  console.log(resources[0].data.symbol) // You can access as CoinInfo
+}
+
+resources.filter(coinUtils.isCoinInfo)
+  .forEach((resource) => console.log(resource.data.symbol))  // You can access as CoinInfo
+
+const coins = resources.filter(coinUtils.isCoinInfo).map(({ type }) => coinUtils.extractCoinInfoTypeParameters(type))
+console.log(coins) // ["0x123456::coin::CoinA", "0x123456::coin::CoinB"]
 ```
