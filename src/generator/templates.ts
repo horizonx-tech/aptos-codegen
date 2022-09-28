@@ -130,16 +130,28 @@ export const imports = (map: Map<string, Set<string>>) =>
     .join('\n')
 
 export const utilities = ({
+  address,
   moduleName,
   resourceNames,
   utilitiesContents,
 }: {
+  address: string
   moduleName: string
   resourceNames: string[]
   utilitiesContents: string[]
-}) => `${comments}import { Types } from 'aptos'
+}) => `${comments}import { TypedMoveResource } from '@horizonx/aptos-module-client'
+import { Types } from 'aptos'
 import { ${resourceNames.join(', ')} } from './${moduleName}'
+
+export class ${moduleName}Utils {
+  private address: string
+
+  constructor(address?: string){
+    this.address = address || '${address}'
+  }
+
 ${utilitiesContents.join('\n')}
+}
 `
 
 export const resourceTypeGuard = ({
@@ -153,15 +165,15 @@ export const resourceTypeGuard = ({
   name: string
   typeParameters: string[] | undefined
 }) =>
-  `
-export const is${name} = ${genericType(
+  `  is${name} = ${genericType(
     typeParameters,
-  )}(resource: Types.MoveResource, ownerAddress?: string): resource is { type: string; data: ${name}${genericType(
+  )}(resource: Types.MoveResource): resource is TypedMoveResource<${name}${genericType(
     typeParameters,
-  )} } => {
-  const regexp = ownerAddress ? new RegExp(\`\${ownerAddress}::${moduleName}::${name}(?:<|$)\`) : /^${moduleId}::${name}(?:<|$)/
-  return regexp.test(resource.type)
-}`
+  )}> => {
+    const regexp = new RegExp(\`\${this.address}::${moduleName}::${name}(?:<|$)\`)
+    return regexp.test(resource.type)
+  }
+`
 
 export const typeParametersExtaractor = ({
   moduleId,
@@ -172,12 +184,11 @@ export const typeParametersExtaractor = ({
   moduleName: string
   name: string
 }) =>
-  `
-export const extract${name}TypeParameters = (type: string, ownerAddress?: string) => {
-  const regexp = ownerAddress ? new RegExp(\`^\${ownerAddress}::${moduleName}::${name}<(.*)>$\`) : /^${moduleId}::${name}<(.*)>$/
-  const result = regexp.exec(type)
-  return result && result[1]?.split(', ')
-}`
+  `  extract${name}TypeParameters = (type: string) => {
+    const result = new RegExp(\`^\${this.address}::${moduleName}::${name}<(.*)>$\`).exec(type)
+    return result && result[1]?.split(', ')
+  }
+`
 
 const genericType = (typeParameters: string[] | undefined) =>
   typeParameters?.length ? `<${typeParameters.join(', ')}>` : ''

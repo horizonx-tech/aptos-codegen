@@ -45,6 +45,7 @@ export type StructDefinition = {
 
 export type ModuleStruct = {
   id: string
+  address: string
   name: string
   abi: MoveModuleJSON
   entryFunctions: FunctionStruct[]

@@ -60,6 +60,7 @@ export const parseFromABI = (abi: MoveModuleJSON): ModuleStruct => {
 
   return {
     id,
+    address: abi.address,
     name: pascalCase(abi.name),
     abi,
     entryFunctions,
