@@ -43,8 +43,9 @@ export const parseFromABI = (abi: MoveModuleJSON): ModuleStruct => {
     })),
   )
 
-  const structs = abi.structs.map(({ name, fields }) => ({
+  const structs = abi.structs.map(({ name, fields, abilities }) => ({
     name,
+    abilities,
     fields: fields.map(({ name, type }) => ({
       name,
       type: toTypeStruct(type),

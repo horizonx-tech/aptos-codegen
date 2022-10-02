@@ -4,6 +4,7 @@ import {
   hasEventHandle,
   hasTypeParameters,
   isEventHandle,
+  isEventHandleFieldStruct,
   isJsNativeType,
   isResource,
   isString,
@@ -16,7 +17,9 @@ import {
   toReservedType,
   toReservedTypeOrAny,
   typesFileName,
+  utilitiesFileName,
 } from 'src/generator/utils'
+import { StructFieldStruct } from 'src/types'
 
 describe('utils', () => {
   describe('isString', () => {
@@ -83,6 +86,47 @@ describe('utils', () => {
     })
     it('otherwise returns false', () => {
       expect(hasEventHandle(struct)).toBeFalsy()
+    })
+  })
+  describe('isEventHandleFieldStruct', () => {
+    const struct: StructFieldStruct = {
+      name: 'example_events',
+      type: 'u8',
+    }
+    it('returns true if type of field is "0x1::event::EventHandle"', () => {
+      expect(
+        isEventHandleFieldStruct({
+          ...struct,
+          type: {
+            moduleId: '0x1::event',
+            name: 'EventHandle',
+            genericTypes: ['0x1::sample::ExampleEvent'],
+          },
+        }),
+      ).toBeTruthy()
+    })
+    it('otherwise returns false', () => {
+      expect(isEventHandleFieldStruct(struct)).toBeFalsy()
+      expect(
+        isEventHandleFieldStruct({
+          ...struct,
+          type: {
+            moduleId: '0x2::event',
+            name: 'EventHandle',
+            genericTypes: ['0x1::sample::ExampleEvent'],
+          },
+        }),
+      ).toBeFalsy()
+      expect(
+        isEventHandleFieldStruct({
+          ...struct,
+          type: {
+            moduleId: '0x1::event',
+            name: 'Other',
+            genericTypes: ['0x1::sample::ExampleEvent'],
+          },
+        }),
+      ).toBeFalsy()
     })
   })
   describe('notSigner', () => {
@@ -219,6 +263,12 @@ describe('utils', () => {
     it('returns as a file name of types', () => {
       const moduleName = 'Coin'
       expect(typesFileName(moduleName)).toBe(`${moduleName}.ts`)
+    })
+  })
+  describe('utilitiesFileName', () => {
+    it('returns as a file name of utilities', () => {
+      const moduleName = 'Coin'
+      expect(utilitiesFileName(moduleName)).toBe(`${moduleName}Utils.ts`)
     })
   })
   describe('factoryFileName', () => {

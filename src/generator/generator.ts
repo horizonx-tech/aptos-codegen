@@ -16,6 +16,8 @@ import {
 } from './templates'
 import {
   factoryFileName,
+  isEventHandleFieldStruct,
+  isResource,
   isString,
   isTypeParameter,
   toPath,
@@ -107,18 +109,22 @@ const generateTypesContent = ({ module, resolver }: GeneratorParams) => {
     })
   })
 
-  const eventsGetters = module.events.map(({ name, type }) => {
-    const genericType = type.genericTypes[0]
-    const structDef = resolver.getStructDefinition(
-      genericType.moduleId,
-      genericType.name,
+  const eventsGetters = module.structs
+    .filter(isResource)
+    .flatMap(({ fields }) =>
+      fields.filter(isEventHandleFieldStruct).map(({ name, type }) => {
+        const genericType = type.genericTypes[0]
+        const structDef = resolver.getStructDefinition(
+          genericType.moduleId,
+          genericType.name,
+        )
+        return eventsGetter({
+          name,
+          type: toTypeName(genericType, resolver),
+          typeParameters: structDef.typeParameters,
+        })
+      }),
     )
-    return eventsGetter({
-      name,
-      type: toTypeName(genericType, resolver),
-      typeParameters: structDef.typeParameters,
-    })
-  })
 
   const structs = module.structs.map((each) => {
     const fields = each.fields.map(({ name, type }) =>

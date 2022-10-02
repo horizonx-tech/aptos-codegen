@@ -1,5 +1,5 @@
 import { MoveStruct, MoveStructField } from 'aptos/dist/generated'
-import { TypeStruct } from 'src/types'
+import { EventHandleFieldStrut, StructFieldStruct, TypeStruct } from 'src/types'
 import {
   JS_NATIVE_TYPES,
   RESERVED_TYPE_DICT,
@@ -17,6 +17,13 @@ export const isEventHandle = ({ type }: MoveStructField) =>
 
 export const hasEventHandle = (struct: MoveStruct) =>
   struct.fields.some(isEventHandle)
+
+export const isEventHandleFieldStruct = (
+  field: StructFieldStruct,
+): field is EventHandleFieldStrut =>
+  !isString(field.type) &&
+  field.type.moduleId === '0x1::event' &&
+  field.type.name === 'EventHandle'
 
 export const notSigner = (param: string) => param !== '&signer'
 

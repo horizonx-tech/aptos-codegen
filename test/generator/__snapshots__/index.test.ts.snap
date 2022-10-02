@@ -21,8 +21,8 @@ export interface AccountModule extends AptosModuleClient  {
   rotate_authentication_key: (payload: { arguments: [BCS.Uint8, Array<BCS.Uint8>, BCS.Uint8, Array<BCS.Uint8>, Array<BCS.Uint8>, Array<BCS.Uint8>] }, options?: Partial<Types.SubmitTransactionRequest>) => Promise<void>
   getAccount: (owner: MaybeHexString, typeParameter?: string) => Promise<TypedMoveResource<Account>>
   getOriginatingAddress: (owner: MaybeHexString, typeParameter?: string) => Promise<TypedMoveResource<OriginatingAddress>>
-  getCoinRegisterEvents: (address: MaybeHexString, typeParameter?: string) => Promise<TypedEvent<CoinRegisterEvent>>
-  getKeyRotationEvents: (address: MaybeHexString, typeParameter?: string) => Promise<TypedEvent<KeyRotationEvent>>
+  getCoinRegisterEvents: (address: MaybeHexString, params: { typeParameter?: string, query?: { start?:BigInt, limit?: number } }) => Promise<TypedEvent<CoinRegisterEvent[]>>
+  getKeyRotationEvents: (address: MaybeHexString, params: { typeParameter?: string, query?: { start?:BigInt, limit?: number } }) => Promise<TypedEvent<KeyRotationEvent[]>>
 }
 
 export type Account = {
@@ -587,9 +587,9 @@ export interface AptosGovernanceModule extends AptosModuleClient  {
   getGovernanceEvents: (owner: MaybeHexString, typeParameter?: string) => Promise<TypedMoveResource<GovernanceEvents>>
   getGovernanceResponsbility: (owner: MaybeHexString, typeParameter?: string) => Promise<TypedMoveResource<GovernanceResponsbility>>
   getVotingRecords: (owner: MaybeHexString, typeParameter?: string) => Promise<TypedMoveResource<VotingRecords>>
-  getCreateProposalEvents: (address: MaybeHexString, typeParameter?: string) => Promise<TypedEvent<CreateProposalEvent>>
-  getUpdateConfigEvents: (address: MaybeHexString, typeParameter?: string) => Promise<TypedEvent<UpdateConfigEvent>>
-  getVoteEvents: (address: MaybeHexString, typeParameter?: string) => Promise<TypedEvent<VoteEvent>>
+  getCreateProposalEvents: (address: MaybeHexString, params: { typeParameter?: string, query?: { start?:BigInt, limit?: number } }) => Promise<TypedEvent<CreateProposalEvent[]>>
+  getUpdateConfigEvents: (address: MaybeHexString, params: { typeParameter?: string, query?: { start?:BigInt, limit?: number } }) => Promise<TypedEvent<UpdateConfigEvent[]>>
+  getVoteEvents: (address: MaybeHexString, params: { typeParameter?: string, query?: { start?:BigInt, limit?: number } }) => Promise<TypedEvent<VoteEvent[]>>
 }
 
 export type ApprovedExecutionHashes = {
@@ -1382,8 +1382,8 @@ export interface CoinModule extends AptosModuleClient  {
   getCoinInfo: (owner: MaybeHexString, typeParameter?: string) => Promise<TypedMoveResource<CoinInfo>>
   getCoinStore: (owner: MaybeHexString, typeParameter?: string) => Promise<TypedMoveResource<CoinStore>>
   getSupplyConfig: (owner: MaybeHexString, typeParameter?: string) => Promise<TypedMoveResource<SupplyConfig>>
-  getDepositEvents: (address: MaybeHexString, typeParameter?: string) => Promise<TypedEvent<DepositEvent>>
-  getWithdrawEvents: (address: MaybeHexString, typeParameter?: string) => Promise<TypedEvent<WithdrawEvent>>
+  getDepositEvents: (address: MaybeHexString, params: { typeParameter?: string, query?: { start?:BigInt, limit?: number } }) => Promise<TypedEvent<DepositEvent[]>>
+  getWithdrawEvents: (address: MaybeHexString, params: { typeParameter?: string, query?: { start?:BigInt, limit?: number } }) => Promise<TypedEvent<WithdrawEvent[]>>
 }
 
 export type BurnCapability = {
@@ -2273,11 +2273,11 @@ export interface PoolModule extends AptosModuleClient  {
   getPool: (owner: MaybeHexString, typeParameter?: string) => Promise<TypedMoveResource<Pool>>
   getPoolEventHandle: (owner: MaybeHexString, typeParameter?: string) => Promise<TypedMoveResource<PoolEventHandle>>
   getStorage: (owner: MaybeHexString, typeParameter?: string) => Promise<TypedMoveResource<Storage>>
-  getDepositEvent: (address: MaybeHexString, typeParameter?: string) => Promise<TypedEvent<DepositEvent>>
-  getWithdrawEvent: (address: MaybeHexString, typeParameter?: string) => Promise<TypedEvent<WithdrawEvent>>
-  getBorrowEvent: (address: MaybeHexString, typeParameter?: string) => Promise<TypedEvent<BorrowEvent>>
-  getRepayEvent: (address: MaybeHexString, typeParameter?: string) => Promise<TypedEvent<RepayEvent>>
-  getLiquidateEvent: (address: MaybeHexString, typeParameter?: string) => Promise<TypedEvent<LiquidateEvent>>
+  getDepositEvent: (address: MaybeHexString, params: { typeParameter?: string, query?: { start?:BigInt, limit?: number } }) => Promise<TypedEvent<DepositEvent[]>>
+  getWithdrawEvent: (address: MaybeHexString, params: { typeParameter?: string, query?: { start?:BigInt, limit?: number } }) => Promise<TypedEvent<WithdrawEvent[]>>
+  getBorrowEvent: (address: MaybeHexString, params: { typeParameter?: string, query?: { start?:BigInt, limit?: number } }) => Promise<TypedEvent<BorrowEvent[]>>
+  getRepayEvent: (address: MaybeHexString, params: { typeParameter?: string, query?: { start?:BigInt, limit?: number } }) => Promise<TypedEvent<RepayEvent[]>>
+  getLiquidateEvent: (address: MaybeHexString, params: { typeParameter?: string, query?: { start?:BigInt, limit?: number } }) => Promise<TypedEvent<LiquidateEvent[]>>
 }
 
 export type BorrowEvent = {

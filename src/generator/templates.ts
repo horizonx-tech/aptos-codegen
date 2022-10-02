@@ -1,4 +1,5 @@
 import { MoveModuleJSON } from '@horizonx/aptos-module-client'
+import { pascalCase } from 'change-case'
 import { FunctionStruct } from 'src/types'
 
 export const factory = ({
@@ -98,11 +99,11 @@ export const eventsGetter = ({
   type: string
   typeParameters: string[] | undefined
 }) =>
-  `get${name}: ${genericType(
+  `get${pascalCase(name)}: ${genericType(
     typeParameters,
-  )}(address: MaybeHexString, typeParameter?: string) => Promise<TypedEvent<${type}${genericType(
+  )}(address: MaybeHexString, params: { typeParameter?: string, query?: { start?:BigInt, limit?: number } }) => Promise<TypedEvent<${type}${genericType(
     typeParameters,
-  )}>>`
+  )}[]>>`
 
 export const struct = ({
   name,

@@ -137,6 +137,7 @@ describe('parser', () => {
       const structs: StructStruct[] = [
         {
           name: '0x1::coin::Example',
+          abilities: ['key'],
           fields: [
             {
               name: 'example',

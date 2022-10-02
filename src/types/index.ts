@@ -1,4 +1,5 @@
 import { MoveModuleJSON } from '@horizonx/aptos-module-client'
+import { MoveAbility } from 'aptos/dist/generated'
 
 export type StructTypeStruct = {
   moduleId: string
@@ -30,13 +31,21 @@ export type ResourceStruct = {
 
 export type StructStruct = {
   name: string
-  fields: {
-    name: string
-    type: TypeStruct
-  }[]
+  abilities: MoveAbility[]
+  fields: StructFieldStruct[]
+}
+
+export type StructFieldStruct = {
+  name: string
+  type: TypeStruct
 }
 
 export type EventStruct = {
+  name: string
+  type: EventHandleTypeStruct
+}
+
+export type EventHandleFieldStrut = {
   name: string
   type: EventHandleTypeStruct
 }
