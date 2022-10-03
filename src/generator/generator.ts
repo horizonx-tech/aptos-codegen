@@ -9,6 +9,7 @@ import {
   resourceTypeGuard,
   struct,
   structField,
+  toAlias,
   typeParametersExtaractor,
   types,
   typesContent,
@@ -84,14 +85,27 @@ const generateUtilities = ({ module, resolver }: GeneratorParams) => {
 }
 
 const generateTypes = (params: GeneratorParams) => {
-  const importsContent = imports(params.resolver.getDependenciesMap())
+  const dependenciesMap = params.resolver.getDependenciesMap()
+  const typeCount = Array.from(dependenciesMap.values())
+    .flatMap((values) => Array.from(values))
+    .reduce<Record<string, number>>(
+      (res, type) => ({
+        ...res,
+        [type]: (res[type] || 0) + 1,
+      }),
+      {},
+    )
+  const importsContent = imports(params.module.id, dependenciesMap, typeCount)
   return types({
     importsContent,
-    typesContent: generateTypesContent(params),
+    typesContent: generateTypesContent(params, typeCount),
   })
 }
 
-const generateTypesContent = ({ module, resolver }: GeneratorParams) => {
+const generateTypesContent = (
+  { module, resolver }: GeneratorParams,
+  typeCount: Record<string, number>,
+) => {
   const entryFunctions = module.entryFunctions.map(
     ({ name, typeArguments, args }) =>
       entryFunction({
@@ -130,7 +144,7 @@ const generateTypesContent = ({ module, resolver }: GeneratorParams) => {
     const fields = each.fields.map(({ name, type }) =>
       structField({
         name: name,
-        type: toTypeName(type, resolver),
+        type: toTypeName(type, resolver, typeCount),
       }),
     )
     const structDef = resolver.getStructDefinition(module.id, each.name)
@@ -150,21 +164,27 @@ const generateTypesContent = ({ module, resolver }: GeneratorParams) => {
   })
 }
 
-const toTypeName = (type: TypeStruct, resolver: IModuleResolver): string => {
+const toTypeName = (
+  type: TypeStruct,
+  resolver: IModuleResolver,
+  typeCount: Record<string, number> = {},
+): string => {
   if (isString(type))
     return isTypeParameter(type) ? type : toReservedTypeOrAny(type)
   if (!type.moduleId) {
     const genericTypeNames = type.genericTypes.map((type) =>
-      toTypeName(type, resolver),
+      toTypeName(type, resolver, typeCount),
     )
     return `Array<${genericTypeNames.join(', ')}>`
   }
   const structDef = resolver.getStructDefinition(type.moduleId, type.name)
-  return `${type.name}${
+  const typeName =
+    typeCount[type.name] > 1 ? toAlias(type.moduleId, type.name) : type.name
+  return `${typeName}${
     structDef.typeParameters?.length
       ? `<${type.genericTypes
           .slice(0, structDef.typeParameters.length)
-          .map((each) => toTypeName(each, resolver))
+          .map((each) => toTypeName(each, resolver, typeCount))
           .join(', ')}>`
       : ''
   }`

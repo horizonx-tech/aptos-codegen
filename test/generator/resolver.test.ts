@@ -23,7 +23,16 @@ describe('resolver', () => {
           new Set(['AptosModuleClient']),
         )
       })
-      it('can resolve build struct definitionMap', () => {
+      it('can resolve modules', () => {
+        const modules: ConstructorParameters<typeof ModuleResolverFactory>[0] =
+          [{ id: '', name: '', structs: [] }]
+        const factory = new ModuleResolverFactory(modules)
+        const resolver = factory.build(['0x1::exmple::Example'])
+        const dependenciesMap = resolver.getDependenciesMap()
+        expect(Array.from(dependenciesMap.keys())).toHaveLength(1)
+        expect(dependenciesMap.get('0x1::exmple')).toEqual(new Set(['Example']))
+      })
+      it('can build struct definitionMap', () => {
         const modules: ConstructorParameters<typeof ModuleResolverFactory>[0] =
           [STRING_STRUCT]
         const factory = new ModuleResolverFactory(modules)
@@ -44,6 +53,7 @@ describe('resolver', () => {
               structs: [
                 {
                   name: 'example',
+                  abilities: [],
                   fields: [
                     { name: 'boolean', type: 'bool' },
                     { name: 'string', type: '0x1::string::String' },
@@ -62,11 +72,11 @@ describe('resolver', () => {
         const dependenciesMap = resolver.getDependenciesMap()
         expect(Array.from(dependenciesMap.keys())).toHaveLength(0)
       })
-      it('ignore if module path not found', () => {
+      it('ignore if module id or reserved key not found', () => {
         const modules: ConstructorParameters<typeof ModuleResolverFactory>[0] =
           [STRING_STRUCT]
         const factory = new ModuleResolverFactory(modules)
-        const resolver = factory.build(['0x1::exmaple::undefined'])
+        const resolver = factory.build(['undefined'])
         const dependenciesMap = resolver.getDependenciesMap()
         expect(Array.from(dependenciesMap.keys())).toHaveLength(0)
       })
@@ -93,6 +103,7 @@ describe('resolver', () => {
               structs: [
                 {
                   name: 'IterableTable',
+                  abilities: [],
                   fields: [
                     {
                       name: 'head',
@@ -145,6 +156,7 @@ describe('resolver', () => {
           structs: [
             {
               name: 'Example',
+              abilities: [],
               fields: [
                 {
                   name: 'example',
@@ -171,6 +183,7 @@ describe('resolver', () => {
           structs: [
             {
               name: 'Example',
+              abilities: [],
               fields: [
                 {
                   name: 'example',
@@ -199,6 +212,7 @@ describe('resolver', () => {
           structs: [
             {
               name: 'Example',
+              abilities: [],
               fields: [
                 {
                   name: 'example',
@@ -227,6 +241,7 @@ describe('resolver', () => {
           structs: [
             {
               name: 'Example',
+              abilities: [],
               fields: [
                 {
                   name: 'example',
@@ -251,6 +266,7 @@ describe('resolver', () => {
           structs: [
             {
               name: 'Example',
+              abilities: [],
               fields: [
                 {
                   name: 'example',

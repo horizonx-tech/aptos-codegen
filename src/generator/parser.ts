@@ -84,6 +84,7 @@ export const extractDependencies = (
     ...entryFunctions.flatMap(({ args }) => args),
     ...structs.flatMap(({ fields }) => fields.flatMap(({ type }) => type)),
   ]
+  const ownStructs = structs.map(({ name }) => `${moduleId}::${name}`)
   const additionalDependencies = [
     ...(resources.length ? ['address', 'TypedMoveResource', 'Types'] : []),
     ...(entryFunctions.length || resources.length
@@ -95,11 +96,9 @@ export const extractDependencies = (
     new Set([
       ...allTypeStructs
         .flatMap(extractTypeNameRecursive)
-        .filter(
-          (type) =>
-            !type.startsWith(moduleId) && !isJsNativeType(toReservedType(type)),
-        ),
+        .filter((type) => !isJsNativeType(toReservedType(type))),
       ...additionalDependencies,
+      ...ownStructs,
     ]),
   )
 }

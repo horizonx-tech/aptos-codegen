@@ -438,11 +438,11 @@
           },
           {
             "name": "repay_event",
-            "type": "0x1::event::EventHandle<0x3b6e641ab8f8efad88169e44597b9c6822a158a5292a7aa7c0b41cf821603bd9::pool::RepayEvent>"
+            "type": "0x1::event2::EventHandle<0x3b6e641ab8f8efad88169e44597b9c6822a158a5292a7aa7c0b41cf821603bd9::pool::RepayEvent>"
           },
           {
             "name": "liquidate_event",
-            "type": "0x1::event::EventHandle<0x3b6e641ab8f8efad88169e44597b9c6822a158a5292a7aa7c0b41cf821603bd9::pool::LiquidateEvent>"
+            "type": "0x1::event2::EventHandle<0x3b6e641ab8f8efad88169e44597b9c6822a158a5292a7aa7c0b41cf821603bd9::pool::LiquidateEvent>"
           }
         ]
       },

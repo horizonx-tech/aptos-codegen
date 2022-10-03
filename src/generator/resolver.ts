@@ -6,7 +6,6 @@ import {
   isString,
   isTypeParameter,
   toModuleMapKey,
-  toPath,
 } from './utils'
 
 export interface IModuleResolver {
@@ -15,7 +14,7 @@ export interface IModuleResolver {
 }
 
 export class ModuleResolverFactory {
-  private modulePathMap = new Map<string, string>()
+  private reservedModuleKeyMap = new Map<string, string>()
   private structMap = new Map<string, StructStruct>()
   private structDefinitionMap = new Map<string, StructDefinition>()
 
@@ -23,9 +22,8 @@ export class ModuleResolverFactory {
     modules: { id: string; name: string; structs: StructStruct[] }[],
   ) {
     this.resolveGenericTypeParameters(modules)
-    modules.forEach(({ id, name }) => this.modulePathMap.set(id, toPath(name)))
-    RESERVERD_MODULES.forEach(({ path, types }) =>
-      types.forEach((type) => this.modulePathMap.set(type, path)),
+    RESERVERD_MODULES.forEach(({ key, types }) =>
+      types.forEach((type) => this.reservedModuleKeyMap.set(type, key)),
     )
   }
 
@@ -34,14 +32,17 @@ export class ModuleResolverFactory {
     for (const dependency of dependencies) {
       const moduleMapKey = toModuleMapKey(dependency)
       if (isJsNativeType(moduleMapKey)) continue
-      const path = this.modulePathMap.get(moduleMapKey)
-      if (!path) {
-        console.warn('Skip: module path not found:', dependency)
+      const [address, moduleName, typeName] = dependency.split('::')
+      const key = moduleName
+        ? `${address}::${moduleName}`
+        : this.reservedModuleKeyMap.get(moduleMapKey)
+      if (!key) {
+        console.warn('Skip: module id or reserved key not found:', dependency)
         continue
       }
-      const type = dependency.split('::')[2] || moduleMapKey
-      if (dependenciesMap.has(path)) dependenciesMap.get(path).add(type)
-      else dependenciesMap.set(path, new Set([type]))
+      const type = typeName || moduleMapKey
+      if (dependenciesMap.has(key)) dependenciesMap.get(key).add(type)
+      else dependenciesMap.set(key, new Set([type]))
     }
     return new ModuleResolver(dependenciesMap, this.structDefinitionMap)
   }

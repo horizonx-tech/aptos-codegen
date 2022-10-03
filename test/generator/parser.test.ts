@@ -23,7 +23,7 @@ describe('parser', () => {
       expect(module.entryFunctions).toHaveLength(1)
       expect(module.resources).toHaveLength(2)
       expect(module.structs).toHaveLength(5)
-      expect(module.dependencies).toHaveLength(11)
+      expect(module.dependencies).toHaveLength(16)
     })
   })
   describe('toTypeStruct', () => {
@@ -123,8 +123,8 @@ describe('parser', () => {
     })
   })
   describe('extractDependencies', () => {
-    it('can extract types from entryFunctions and structs except self-defined types', () => {
-      const moduleId = '0x::coin'
+    it('can extract types from entryFunctions and structs', () => {
+      const moduleId = '0x1::coin'
       const entryFunctions: FunctionStruct[] = [
         {
           name: '0x1::coin::transfer',
@@ -136,7 +136,7 @@ describe('parser', () => {
       const events: EventStruct[] = []
       const structs: StructStruct[] = [
         {
-          name: '0x1::coin::Example',
+          name: 'Example',
           abilities: ['key'],
           fields: [
             {
@@ -164,6 +164,7 @@ describe('parser', () => {
         'u8',
         'AptosModuleClient',
         'Types',
+        '0x1::coin::Example',
       ])
     })
     it('add "address" and "TypedMoveResource" and "Types" if resources is not empty', () => {
