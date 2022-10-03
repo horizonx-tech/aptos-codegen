@@ -74,7 +74,7 @@ export const entryFunction = (fn: FunctionStruct) => {
   const options = `options?: Partial<Types.SubmitTransactionRequest>`
   return `${fn.name}: (${
     args.length ? `payload: { ${args} }, ${options}` : options
-  }) => Promise<void>`
+  }) => Promise<Types.HashValue>`
 }
 
 export const resourceGetter = ({
