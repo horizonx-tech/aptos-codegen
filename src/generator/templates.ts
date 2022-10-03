@@ -102,7 +102,7 @@ export const eventsGetter = ({
 }) =>
   `get${pascalCase(name)}: ${genericType(
     typeParameters,
-  )}(address: MaybeHexString, params: { typeParameter?: string, query?: { start?:BigInt, limit?: number } }) => Promise<TypedEvent<${type}${genericType(
+  )}(address: MaybeHexString, params: EventGetterParams) => Promise<TypedEvent<${type}${genericType(
     typeParameters,
   )}[]>>`
 
