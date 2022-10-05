@@ -28,13 +28,13 @@
     "clean": "rimraf dist coverage badges"
   },
   "dependencies": {
-    "@horizonx/aptos-module-client": "^0.3.1",
     "aptos": "^1.3.7",
     "change-case": "^4.1.2",
     "glob": "^8.0.3",
     "yargs": "^17.5.1"
   },
   "devDependencies": {
+    "@horizonx/aptos-module-client": "^0.3.1",
     "@swc/core": "^1.2.242",
     "@swc/jest": "^0.2.22",
     "@types/glob": "^7.2.0",
