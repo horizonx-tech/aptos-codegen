@@ -25,7 +25,9 @@ describe('loader', () => {
       return {} as any
     })
     await expect(
-      loader.loadModules(['0x1::option'], ['thrown']),
+      loader.loadModules(['0x1::option'], {
+        abiFilePathPatterns: ['thrown'],
+      }),
     ).rejects.toThrowError()
   })
 })

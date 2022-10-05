@@ -24,8 +24,14 @@ describe('generator', () => {
         '0x1::coin',
         '0x1::aptos_governance',
         '0x1::iterable_table',
+        '0x2::coin',
         '0x3b6e641ab8f8efad88169e44597b9c6822a158a5292a7aa7c0b41cf821603bd9::pool',
       ],
+      aliases: {
+        '0x1': 'framework',
+        '0x3b6e641ab8f8efad88169e44597b9c6822a158a5292a7aa7c0b41cf821603bd9':
+          'protocol',
+      },
       abiFilePathPatterns: ['abi/**/*.json'],
     })
     expect(

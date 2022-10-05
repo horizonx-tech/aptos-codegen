@@ -7,6 +7,7 @@ export const STRING_STRUCT: MODULE_STRUCTS = {
   structs: [
     {
       name: 'String',
+      abilities: [],
       fields: [
         {
           name: 'bytes',
@@ -23,6 +24,7 @@ export const OPTION_STRUCT: MODULE_STRUCTS = {
   structs: [
     {
       name: 'Option',
+      abilities: [],
       fields: [
         {
           name: 'vec',
@@ -39,6 +41,7 @@ export const ITERABLE_VALUE_STRUCT: MODULE_STRUCTS = {
   structs: [
     {
       name: 'IterableValue',
+      abilities: [],
       fields: [
         { name: 'val', type: 'T1' },
         {

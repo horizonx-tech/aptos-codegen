@@ -1,7 +1,6 @@
 import { MoveModuleJSON } from '@horizonx/aptos-module-client'
 import { pascalCase } from 'change-case'
 import { FunctionStruct } from 'src/types'
-import { toPath } from './utils'
 
 export const factory = ({
   name,
@@ -124,24 +123,26 @@ export const structField = ({ name, type }: { name: string; type: string }) =>
 
 export const imports = (
   moduleId: string,
-  map: Map<string, Set<string>>,
+  dependenciesMap: Map<string, { path: string; types: Set<string> }>,
   typeCount: Record<string, number>,
-) =>
-  Array.from(map.entries())
-    .filter(([key]) => !key.startsWith(moduleId))
-    .map(([key, typeSet]) => {
-      const moduleName = key.split('::')[1]
-      return `import { ${Array.from(typeSet)
+  aliased?: boolean,
+) => {
+  const [moduleAddress] = moduleId.split('::')
+  return Array.from(dependenciesMap.entries())
+    .filter(([key]) => key !== moduleId)
+    .map(([key, { path, types }]) => {
+      const [address, moduleName] = key.split('::')
+      const aliasedPath =
+        aliased && moduleName && address !== moduleAddress ? `.${path}` : path
+      return `import { ${Array.from(types)
         .map((type) =>
           moduleName && typeCount[type] > 1 ? toAliasedImport(key, type) : type,
         )
         .sort()
-        .join(', ')} } from '${
-        moduleName ? toPath(pascalCase(moduleName)) : key
-      }'`
+        .join(', ')} } from '${aliasedPath}'`
     })
     .join('\n')
-
+}
 export const utilities = ({
   address,
   moduleName,

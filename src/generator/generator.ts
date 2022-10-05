@@ -31,33 +31,37 @@ type GeneratorParams = {
   module: ModuleStruct
   resolver: IModuleResolver
   factoryDisabled?: boolean
+  alias?: string
 }
 
-export const generate = (params: GeneratorParams) => ({
-  factory:
-    params.factoryDisabled ||
-    (params.module.entryFunctions.length === 0 &&
-      params.module.resources.length === 0)
-      ? undefined
-      : {
-          content: factory({
-            name: params.module.name,
-            abi: params.module.abi,
-          }),
-          path: toPath(factoryFileName(params.module.name)),
-        },
-  types: {
-    content: generateTypes(params),
-    path: toPath(typesFileName(params.module.name)),
-  },
-  utilities:
-    params.module.resources.length === 0
-      ? undefined
-      : {
-          content: generateUtilities(params),
-          path: toPath(utilitiesFileName(params.module.name)),
-        },
-})
+export const generate = (params: GeneratorParams) => {
+  const prefix = params.alias ? `./${params.alias}/` : undefined
+  return {
+    factory:
+      params.factoryDisabled ||
+      (params.module.entryFunctions.length === 0 &&
+        params.module.resources.length === 0)
+        ? undefined
+        : {
+            content: factory({
+              name: params.module.name,
+              abi: params.module.abi,
+            }),
+            path: toPath(factoryFileName(params.module.name), prefix),
+          },
+    types: {
+      content: generateTypes(params),
+      path: toPath(typesFileName(params.module.name), prefix),
+    },
+    utilities:
+      params.module.resources.length === 0
+        ? undefined
+        : {
+            content: generateUtilities(params),
+            path: toPath(utilitiesFileName(params.module.name), prefix),
+          },
+  }
+}
 
 const generateUtilities = ({ module, resolver }: GeneratorParams) => {
   const resourceTypeGuards = module.resources.map(({ name }) => {
@@ -87,7 +91,7 @@ const generateUtilities = ({ module, resolver }: GeneratorParams) => {
 const generateTypes = (params: GeneratorParams) => {
   const dependenciesMap = params.resolver.getDependenciesMap()
   const typeCount = Array.from(dependenciesMap.values())
-    .flatMap((values) => Array.from(values))
+    .flatMap((values) => Array.from(values.types))
     .reduce<Record<string, number>>(
       (res, type) => ({
         ...res,
@@ -95,7 +99,12 @@ const generateTypes = (params: GeneratorParams) => {
       }),
       {},
     )
-  const importsContent = imports(params.module.id, dependenciesMap, typeCount)
+  const importsContent = imports(
+    params.module.id,
+    dependenciesMap,
+    typeCount,
+    !!params.alias,
+  )
   return types({
     importsContent,
     typesContent: generateTypesContent(params, typeCount),

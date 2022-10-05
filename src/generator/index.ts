@@ -11,15 +11,16 @@ export const execute = async (config: Config) => {
 }
 
 export const generateFiles = async (config: Config) => {
-  const modules = await new ModuleLoader(
+  const { modules, aliases } = await new ModuleLoader(
     new AptosClient(config.nodeUrl),
-  ).loadModules(config.modules, config.abiFilePathPatterns)
-  const resolverFactory = new ModuleResolverFactory(modules)
+  ).loadModules(config.modules, config)
+  const resolverFactory = new ModuleResolverFactory(modules, aliases)
   return modules.map((module) =>
     generate({
       module,
-      resolver: resolverFactory.build(module.dependencies),
+      resolver: resolverFactory.build(module.id, module.dependencies),
       factoryDisabled: !config.modules.includes(module.id),
+      alias: aliases[module.address],
     }),
   )
 }
