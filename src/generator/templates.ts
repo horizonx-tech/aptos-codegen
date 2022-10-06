@@ -103,7 +103,7 @@ export const eventsGetter = ({
     typeParameters,
   )}(address: MaybeHexString, params?: EventGetterParams) => Promise<TypedEvent<${type}${genericType(
     typeParameters,
-  )}[]>>`
+  )}>[]>`
 
 export const struct = ({
   name,
