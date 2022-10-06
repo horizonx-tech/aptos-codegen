@@ -21,8 +21,8 @@ export interface AccountModule extends AptosModuleClient  {
   rotate_authentication_key: (payload: { arguments: [BCS.Uint8, Array<BCS.Uint8>, BCS.Uint8, Array<BCS.Uint8>, Array<BCS.Uint8>, Array<BCS.Uint8>] }, options?: Partial<Types.SubmitTransactionRequest>) => Promise<Types.HashValue>
   getAccount: (owner: MaybeHexString, typeParameter?: string) => Promise<TypedMoveResource<Account>>
   getOriginatingAddress: (owner: MaybeHexString, typeParameter?: string) => Promise<TypedMoveResource<OriginatingAddress>>
-  getCoinRegisterEvents: (address: MaybeHexString, params: EventGetterParams) => Promise<TypedEvent<CoinRegisterEvent[]>>
-  getKeyRotationEvents: (address: MaybeHexString, params: EventGetterParams) => Promise<TypedEvent<KeyRotationEvent[]>>
+  getCoinRegisterEvents: (address: MaybeHexString, params: EventGetterParams) => Promise<TypedEvent<CoinRegisterEvent>[]>
+  getKeyRotationEvents: (address: MaybeHexString, params: EventGetterParams) => Promise<TypedEvent<KeyRotationEvent>[]>
 }
 
 export type Account = {
@@ -587,9 +587,9 @@ export interface AptosGovernanceModule extends AptosModuleClient  {
   getGovernanceEvents: (owner: MaybeHexString, typeParameter?: string) => Promise<TypedMoveResource<GovernanceEvents>>
   getGovernanceResponsbility: (owner: MaybeHexString, typeParameter?: string) => Promise<TypedMoveResource<GovernanceResponsbility>>
   getVotingRecords: (owner: MaybeHexString, typeParameter?: string) => Promise<TypedMoveResource<VotingRecords>>
-  getCreateProposalEvents: (address: MaybeHexString, params: EventGetterParams) => Promise<TypedEvent<CreateProposalEvent[]>>
-  getUpdateConfigEvents: (address: MaybeHexString, params: EventGetterParams) => Promise<TypedEvent<UpdateConfigEvent[]>>
-  getVoteEvents: (address: MaybeHexString, params: EventGetterParams) => Promise<TypedEvent<VoteEvent[]>>
+  getCreateProposalEvents: (address: MaybeHexString, params: EventGetterParams) => Promise<TypedEvent<CreateProposalEvent>[]>
+  getUpdateConfigEvents: (address: MaybeHexString, params: EventGetterParams) => Promise<TypedEvent<UpdateConfigEvent>[]>
+  getVoteEvents: (address: MaybeHexString, params: EventGetterParams) => Promise<TypedEvent<VoteEvent>[]>
 }
 
 export type ApprovedExecutionHashes = {
@@ -1382,8 +1382,8 @@ export interface CoinModule extends AptosModuleClient  {
   getCoinInfo: (owner: MaybeHexString, typeParameter?: string) => Promise<TypedMoveResource<CoinInfo>>
   getCoinStore: (owner: MaybeHexString, typeParameter?: string) => Promise<TypedMoveResource<CoinStore>>
   getSupplyConfig: (owner: MaybeHexString, typeParameter?: string) => Promise<TypedMoveResource<SupplyConfig>>
-  getDepositEvents: (address: MaybeHexString, params: EventGetterParams) => Promise<TypedEvent<DepositEvent[]>>
-  getWithdrawEvents: (address: MaybeHexString, params: EventGetterParams) => Promise<TypedEvent<WithdrawEvent[]>>
+  getDepositEvents: (address: MaybeHexString, params: EventGetterParams) => Promise<TypedEvent<DepositEvent>[]>
+  getWithdrawEvents: (address: MaybeHexString, params: EventGetterParams) => Promise<TypedEvent<WithdrawEvent>[]>
 }
 
 export type BurnCapability = {
@@ -2292,9 +2292,9 @@ export interface PoolModule extends AptosModuleClient  {
   getPool: (owner: MaybeHexString, typeParameter?: string) => Promise<TypedMoveResource<Pool>>
   getPoolEventHandle: (owner: MaybeHexString, typeParameter?: string) => Promise<TypedMoveResource<PoolEventHandle>>
   getStorage: (owner: MaybeHexString, typeParameter?: string) => Promise<TypedMoveResource<Storage>>
-  getDepositEvent: (address: MaybeHexString, params: EventGetterParams) => Promise<TypedEvent<DepositEvent[]>>
-  getWithdrawEvent: (address: MaybeHexString, params: EventGetterParams) => Promise<TypedEvent<WithdrawEvent[]>>
-  getBorrowEvent: (address: MaybeHexString, params: EventGetterParams) => Promise<TypedEvent<BorrowEvent[]>>
+  getDepositEvent: (address: MaybeHexString, params: EventGetterParams) => Promise<TypedEvent<DepositEvent>[]>
+  getWithdrawEvent: (address: MaybeHexString, params: EventGetterParams) => Promise<TypedEvent<WithdrawEvent>[]>
+  getBorrowEvent: (address: MaybeHexString, params: EventGetterParams) => Promise<TypedEvent<BorrowEvent>[]>
 }
 
 export type BorrowEvent = {
