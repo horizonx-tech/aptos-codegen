@@ -11,32 +11,69 @@ describe('resolver', () => {
     describe('build', () => {
       it('can resolve reserved modules', () => {
         const modules: ConstructorParameters<typeof ModuleResolverFactory>[0] =
-          [{ id: '', name: '', structs: [] }]
+          [{ id: '0x1::example', name: '', structs: [] }]
         const factory = new ModuleResolverFactory(modules)
-        const resolver = factory.build(['u8', 'address', 'AptosModuleClient'])
+        const resolver = factory.build(modules[0].id, [
+          'u8',
+          'address',
+          'AptosModuleClient',
+        ])
         const dependenciesMap = resolver.getDependenciesMap()
         expect(Array.from(dependenciesMap.keys())).toHaveLength(2)
-        expect(dependenciesMap.get('aptos')).toEqual(
-          new Set(['BCS', 'MaybeHexString']),
-        )
-        expect(dependenciesMap.get('@horizonx/aptos-module-client')).toEqual(
-          new Set(['AptosModuleClient']),
-        )
+        expect(dependenciesMap.get('aptos')).toEqual({
+          path: 'aptos',
+          types: new Set(['BCS', 'MaybeHexString']),
+        })
+        expect(dependenciesMap.get('@horizonx/aptos-module-client')).toEqual({
+          path: '@horizonx/aptos-module-client',
+          types: new Set(['AptosModuleClient']),
+        })
       })
       it('can resolve modules', () => {
         const modules: ConstructorParameters<typeof ModuleResolverFactory>[0] =
-          [{ id: '', name: '', structs: [] }]
+          [{ id: '0x1::example', name: '', structs: [] }]
         const factory = new ModuleResolverFactory(modules)
-        const resolver = factory.build(['0x1::exmple::Example'])
+        const resolver = factory.build(modules[0].id, ['0x1::example::Example'])
         const dependenciesMap = resolver.getDependenciesMap()
         expect(Array.from(dependenciesMap.keys())).toHaveLength(1)
-        expect(dependenciesMap.get('0x1::exmple')).toEqual(new Set(['Example']))
+        expect(dependenciesMap.get('0x1::example')).toEqual({
+          path: './Example',
+          types: new Set(['Example']),
+        })
+      })
+      it('can resolve modules with alias', () => {
+        const modules: ConstructorParameters<typeof ModuleResolverFactory>[0] =
+          [
+            {
+              id: '0x1::example',
+              name: 'Example',
+              structs: [],
+            },
+            { id: '0x2::example', name: 'Example', structs: [] },
+          ]
+        const factory = new ModuleResolverFactory(modules, {
+          '0x2': '0x2',
+        })
+        const resolver = factory.build(modules[0].id, [
+          '0x1::example::Example',
+          '0x2::example::Example',
+        ])
+        const dependenciesMap = resolver.getDependenciesMap()
+        expect(Array.from(dependenciesMap.keys())).toHaveLength(2)
+        expect(dependenciesMap.get('0x1::example')).toEqual({
+          path: './Example',
+          types: new Set(['Example']),
+        })
+        expect(dependenciesMap.get('0x2::example')).toEqual({
+          path: './0x2/Example',
+          types: new Set(['Example']),
+        })
       })
       it('can build struct definitionMap', () => {
         const modules: ConstructorParameters<typeof ModuleResolverFactory>[0] =
           [STRING_STRUCT]
         const factory = new ModuleResolverFactory(modules)
-        const resolver = factory.build([])
+        const resolver = factory.build('', [])
         expect(
           resolver.getStructDefinition(STRING_STRUCT.id, STRING_STRUCT.name),
         ).toEqual({
@@ -64,7 +101,7 @@ describe('resolver', () => {
             },
           ]
         const factory = new ModuleResolverFactory(modules)
-        const resolver = factory.build([
+        const resolver = factory.build(modules[1].id, [
           'bool',
           '0x1::string::String',
           'vector',
@@ -76,7 +113,7 @@ describe('resolver', () => {
         const modules: ConstructorParameters<typeof ModuleResolverFactory>[0] =
           [STRING_STRUCT]
         const factory = new ModuleResolverFactory(modules)
-        const resolver = factory.build(['undefined'])
+        const resolver = factory.build(modules[0].id, ['undefined'])
         const dependenciesMap = resolver.getDependenciesMap()
         expect(Array.from(dependenciesMap.keys())).toHaveLength(0)
       })
@@ -86,7 +123,7 @@ describe('resolver', () => {
         const modules: ConstructorParameters<typeof ModuleResolverFactory>[0] =
           [OPTION_STRUCT]
         const factory = new ModuleResolverFactory(modules)
-        const resolver = factory.build([])
+        const resolver = factory.build('', [])
         expect(
           resolver.getStructDefinition(OPTION_STRUCT.id, OPTION_STRUCT.name),
         ).toEqual({
@@ -115,7 +152,7 @@ describe('resolver', () => {
             },
           ]
         const factory = new ModuleResolverFactory(modules)
-        const resolver = factory.build([])
+        const resolver = factory.build('', [])
         expect(
           resolver.getStructDefinition('0x1::iterable_table', 'IterableTable'),
         ).toEqual({
@@ -126,7 +163,7 @@ describe('resolver', () => {
         const modules: ConstructorParameters<typeof ModuleResolverFactory>[0] =
           [OPTION_STRUCT, ITERABLE_VALUE_STRUCT]
         const factory = new ModuleResolverFactory(modules)
-        const resolver = factory.build([])
+        const resolver = factory.build('', [])
         expect(
           resolver.getStructDefinition('0x1::iterable_table', 'IterableValue'),
         ).toEqual({
@@ -140,7 +177,7 @@ describe('resolver', () => {
         OPTION_STRUCT,
       ]
       const factory = new ModuleResolverFactory(modules)
-      const resolver = factory.build([])
+      const resolver = factory.build('', [])
       expect(
         resolver.getStructDefinition('0x1::iterable_table', 'IterableValue'),
       ).toEqual({
@@ -168,7 +205,7 @@ describe('resolver', () => {
         },
       ]
       const factory = new ModuleResolverFactory(modules)
-      const resolver = factory.build([])
+      const resolver = factory.build('', [])
       expect(resolver.getStructDefinition('0x1::example', 'Example')).toEqual({
         typeParameters: [],
       })
@@ -197,7 +234,7 @@ describe('resolver', () => {
         },
       ]
       const factory = new ModuleResolverFactory(modules)
-      const resolver = factory.build([])
+      const resolver = factory.build('', [])
       expect(resolver.getStructDefinition('0x1::example', 'Example')).toEqual({
         typeParameters: ['T0'],
       })
@@ -226,7 +263,7 @@ describe('resolver', () => {
         },
       ]
       const factory = new ModuleResolverFactory(modules)
-      const resolver = factory.build([])
+      const resolver = factory.build('', [])
       expect(resolver.getStructDefinition('0x1::example', 'Example')).toEqual({
         typeParameters: ['T0'],
       })
@@ -253,7 +290,7 @@ describe('resolver', () => {
         },
       ]
       const factory = new ModuleResolverFactory(modules)
-      const resolver = factory.build([])
+      const resolver = factory.build('', [])
       expect(resolver.getStructDefinition('0x1::example', 'Example')).toEqual({
         typeParameters: ['T0'],
       })
@@ -278,7 +315,7 @@ describe('resolver', () => {
         },
       ]
       const factory = new ModuleResolverFactory(modules)
-      const resolver = factory.build([])
+      const resolver = factory.build('', [])
       expect(resolver.getStructDefinition('0x1::example', 'Example')).toEqual({
         typeParameters: [],
       })

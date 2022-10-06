@@ -1,5 +1,5 @@
-import { AptosClient } from 'aptos'
 import { MoveModuleJSON } from '@horizonx/aptos-module-client'
+import { AptosClient, Types } from 'aptos'
 import { readFile } from 'fs/promises'
 import { glob } from 'glob'
 import { ModuleStruct } from 'src/types'
@@ -13,10 +13,19 @@ export class ModuleLoader {
 
   constructor(private client: AptosClient) {}
 
-  loadModules = async (moduleIds: string[], abiFilePathPatterns?: string[]) => {
+  loadModules = async (
+    moduleIds: string[],
+    options: {
+      abiFilePathPatterns?: string[]
+      aliases?: Partial<Record<string, string>>
+    } = {},
+  ) => {
+    const { abiFilePathPatterns } = options
     if (abiFilePathPatterns) await this.loadABIFromLocal(abiFilePathPatterns)
     await Promise.all(moduleIds.map(this.loadModule))
-    return Array.from(this.moduleMap.values())
+    const modules = Array.from(this.moduleMap.values())
+    const aliases = this.createAddressAliasesForDuplicatedNameModules(modules)
+    return { modules, aliases: { ...aliases, ...options.aliases } }
   }
 
   private loadModule = async (id: string) => {
@@ -80,5 +89,27 @@ export class ModuleLoader {
     const { abi } = await this.client.getAccountModule(address, name)
     if (!abi) throw new Error(`ABI not found. moduleId: ${id}`)
     return abi
+  }
+
+  private createAddressAliasesForDuplicatedNameModules = (
+    modules: ModuleStruct[],
+  ): Partial<Record<Types.Address, string>> => {
+    const moduleNamesDict = modules.reduce<
+      Partial<Record<string, Types.Address[]>>
+    >((res, { name, address }) => {
+      if (res[name]) res[name].push(address)
+      else res[name] = [address]
+      return res
+    }, {})
+    return Object.values(moduleNamesDict).reduce((res, addresses) => {
+      if (addresses.length <= 1) return res
+      return {
+        ...res,
+        ...addresses.reduce(
+          (res, address) => ({ ...res, [address]: address }),
+          {},
+        ),
+      }
+    }, {})
   }
 }

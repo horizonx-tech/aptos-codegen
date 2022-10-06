@@ -1,4 +1,5 @@
 import { MoveModuleJSON } from '@horizonx/aptos-module-client'
+import { Types } from 'aptos'
 import { MoveAbility } from 'aptos/dist/generated'
 
 export type StructTypeStruct = {
@@ -72,4 +73,9 @@ export type Config = {
   nodeUrl: string
   abiFilePathPatterns?: string[]
   configurationFile?: string
+  aliases?: Partial<Record<Types.Address, string>>
+}
+
+export type RawConfig = Omit<Config, 'aliases'> & {
+  aliases?: string[]
 }

@@ -1,3 +1,5 @@
+import { Types } from 'aptos'
+import { pascalCase } from 'change-case'
 import { StructDefinition, StructStruct, TypeStruct } from 'src/types'
 import { RESERVERD_MODULES } from './constants'
 import {
@@ -6,10 +8,11 @@ import {
   isString,
   isTypeParameter,
   toModuleMapKey,
+  toPath,
 } from './utils'
 
 export interface IModuleResolver {
-  getDependenciesMap: () => Map<string, Set<string>>
+  getDependenciesMap: () => Map<string, { path: string; types: Set<string> }>
   getStructDefinition: (moduleId: string, name: string) => StructDefinition
 }
 
@@ -17,18 +20,24 @@ export class ModuleResolverFactory {
   private reservedModuleKeyMap = new Map<string, string>()
   private structMap = new Map<string, StructStruct>()
   private structDefinitionMap = new Map<string, StructDefinition>()
+  private aliases: Partial<Record<Types.Address, string>>
 
   constructor(
     modules: { id: string; name: string; structs: StructStruct[] }[],
+    aliases: Partial<Record<Types.Address, string>> = {},
   ) {
     this.resolveGenericTypeParameters(modules)
     RESERVERD_MODULES.forEach(({ key, types }) =>
       types.forEach((type) => this.reservedModuleKeyMap.set(type, key)),
     )
+    this.aliases = aliases
   }
 
-  build = (dependencies: string[]): IModuleResolver => {
-    const dependenciesMap = new Map<string, Set<string>>()
+  build = (moduleId: string, dependencies: string[]): IModuleResolver => {
+    const dependenciesMap = new Map<
+      string,
+      { path: string; types: Set<string> }
+    >()
     for (const dependency of dependencies) {
       const moduleMapKey = toModuleMapKey(dependency)
       if (isJsNativeType(moduleMapKey)) continue
@@ -41,8 +50,20 @@ export class ModuleResolverFactory {
         continue
       }
       const type = typeName || moduleMapKey
-      if (dependenciesMap.has(key)) dependenciesMap.get(key).add(type)
-      else dependenciesMap.set(key, new Set([type]))
+      if (dependenciesMap.has(key)) dependenciesMap.get(key).types.add(type)
+      else {
+        const alias = this.aliases[address]
+        const isSameAddress = moduleId.startsWith(address)
+        dependenciesMap.set(key, {
+          path:
+            alias && !isSameAddress
+              ? toPath(pascalCase(moduleName), `./${alias}/`)
+              : moduleName
+              ? toPath(pascalCase(moduleName))
+              : key,
+          types: new Set([type]),
+        })
+      }
     }
     return new ModuleResolver(dependenciesMap, this.structDefinitionMap)
   }
@@ -116,7 +137,7 @@ export class ModuleResolverFactory {
 
 class ModuleResolver implements IModuleResolver {
   constructor(
-    private dependenciesMap: Map<string, Set<string>>,
+    private dependenciesMap: Map<string, { path: string; types: Set<string> }>,
     private structDefinitionMap: Map<string, StructDefinition>,
   ) {}
 

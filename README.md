@@ -57,17 +57,20 @@ aptos-codegen -c {configuration-file}
 
 #### Options
 
-| Option(\*Required) | Description                                      | Examples                                               |
-| ------------------ | ------------------------------------------------ | ------------------------------------------------------ |
-| `-m`\*             | Module identifier(s).                            | `0x1::coin`, `0x1::coin 0x1::account`                  |
-| `-o`\*             | Output generated code to this directory.         | `__generated__`                                        |
-| `-u`\*             | Aptos node URL.                                  | `https://fullnode.devnet.aptoslabs.com/v1`             |
-| `-f`               | ABI file path pattern(s) (glob). (\*1)           | `abi/**/*.json`                                        |
-| `-c`               | Read options from this configuration file. (\*2) | `./aptos-codegen.json` ([example](aptos-codegen.json)) |
+| Option(\*Required) | Description                                                              | Examples                                               |
+| ------------------ | ------------------------------------------------------------------------ | ------------------------------------------------------ |
+| `-m`\*             | Module identifier(s).                                                    | `0x1::coin`, `0x1::coin 0x1::account`                  |
+| `-o`\*             | Output generated code to this directory.                                 | `__generated__`                                        |
+| `-u`\*             | Aptos node URL.                                                          | `https://fullnode.devnet.aptoslabs.com/v1`             |
+| `-f`               | ABI file path pattern(s) (glob). (\*1)                                   | `abi/**/*.json`                                        |
+| `-a`               | Directory name alias(es) of an address for duplicate name modules. (\*2) | `0x1=framework`                                        |
+| `-c`               | Read options from this configuration file. (\*3)                         | `./aptos-codegen.json` ([example](aptos-codegen.json)) |
 
 \*1: ABIs loaded from files are referenced in preference to those loaded from the chain.
 
-\*2: Configuration can be overwritten by arguments.
+\*2: By default, files are output to address dir if a duplicate name module is included.
+
+\*3: Configuration can be overwritten by arguments.
 
 ### Factory
 

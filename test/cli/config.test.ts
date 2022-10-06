@@ -61,6 +61,18 @@ describe('config', () => {
       expect(outDir).toBe(additionalConfig.outDir)
       expect(nodeUrl).toBe(additionalConfig.nodeUrl)
     })
+    it('can parse aliases from args', async () => {
+      jest.spyOn(fs, 'readFileSync').mockReturnValue(JSON.stringify(expected))
+      const { aliases } = await configure([
+        '-c',
+        'path-to-configuration-file',
+        '-a',
+        '0x1=framework',
+        '0x2=example',
+      ])
+      expect(aliases['0x1']).toBe('framework')
+      expect(aliases['0x2']).toBe('example')
+    })
     it('should throw error if outDir is not passed', async () => {
       await expect(
         configure(['-m', expected.modules.join(' '), '-u', expected.nodeUrl]),

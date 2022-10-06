@@ -1,9 +1,10 @@
 import { readFileSync } from 'fs'
-import { Config } from 'src/types'
+import { Config, RawConfig } from 'src/types'
 import yargs from 'yargs'
 
 export const configure = async (args: string[]): Promise<Config> => {
-  let config: Partial<Config> = await yargs(args)
+  let config: Partial<Config> = {}
+  const rawConfigArgs: Partial<RawConfig> = await yargs(args)
     .option('configuration-file', {
       alias: 'c',
       description: 'Configuration File',
@@ -25,6 +26,12 @@ export const configure = async (args: string[]): Promise<Config> => {
       description: 'Node URL',
       type: 'string',
     })
+    .option('--aliases', {
+      alias: 'a',
+      description: 'Aliases of address: {address}={alias}',
+      type: 'string',
+      array: true,
+    })
     .option('--abi-file-path-patterns', {
       alias: 'f',
       description: 'File Path Patterns(glob) of ABI',
@@ -33,6 +40,14 @@ export const configure = async (args: string[]): Promise<Config> => {
     })
     .help().argv
 
+  const { aliases, ...rest } = rawConfigArgs
+  config = {
+    ...rest,
+    aliases: aliases?.reduce((res, each) => {
+      const [address, alias] = each.split('=')
+      return { ...res, [address]: alias }
+    }, {}),
+  }
   if (config.configurationFile) {
     const configInFile: Partial<Config> = JSON.parse(
       readFileSync(config.configurationFile, 'utf8'),
@@ -40,6 +55,10 @@ export const configure = async (args: string[]): Promise<Config> => {
     config = {
       ...configInFile,
       ...config,
+      aliases: {
+        ...configInFile.aliases,
+        ...config.aliases,
+      },
       modules: mergeArrays(configInFile.modules, config.modules),
     }
   }
