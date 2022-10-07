@@ -1,4 +1,4 @@
-import { execute, generateFiles } from 'src/generator'
+import { execute, generateFromModules } from 'src/generator'
 import { writeFiles } from 'src/generator/writer'
 import { Config } from 'src/types'
 
@@ -17,7 +17,7 @@ describe('generator', () => {
     })
   })
   it('snapshot', async () => {
-    const files = await generateFiles({
+    const files = await generateFromModules({
       nodeUrl: 'https://fullnode.devnet.aptoslabs.com/v1',
       outDir: 'test/__snapshots__',
       modules: [

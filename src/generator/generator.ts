@@ -1,6 +1,8 @@
+import { utilsFileContent } from 'src/files/utils'
 import { ModuleStruct, TypeStruct } from 'src/types'
 import { IModuleResolver } from './resolver'
 import {
+  comments,
   entryFunction,
   eventsGetter,
   factory,
@@ -10,7 +12,6 @@ import {
   struct,
   structField,
   toAlias,
-  typeParametersExtaractor,
   types,
   typesContent,
   utilities,
@@ -32,6 +33,13 @@ type GeneratorParams = {
   factoryDisabled?: boolean
   alias?: string
 }
+
+export const generateFiles = () => [
+  {
+    content: `${comments}${utilsFileContent}`,
+    path: 'utils.ts',
+  },
+]
 
 export const generate = (params: GeneratorParams) => {
   const prefix = params.alias ? `./${params.alias}/` : undefined
@@ -72,18 +80,12 @@ const generateUtilities = ({ module, resolver }: GeneratorParams) => {
       typeParameters: structDef.typeParameters,
     })
   })
-  const typeParametersExtaractors = module.resources.map(({ name }) =>
-    typeParametersExtaractor({
-      moduleId: module.id,
-      moduleName: module.abi.name,
-      name,
-    }),
-  )
+
   return utilities({
     address: module.address,
     moduleName: module.name,
     resourceNames: module.resources.map(({ name }) => name),
-    utilitiesContents: [...resourceTypeGuards, ...typeParametersExtaractors],
+    utilitiesContents: [...resourceTypeGuards],
   })
 }
 

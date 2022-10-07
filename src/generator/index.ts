@@ -1,16 +1,17 @@
 import { AptosClient } from 'aptos'
 import { Config } from 'src/types'
-import { generate } from './generator'
+import { generate, generateFiles } from './generator'
 import { ModuleLoader } from './loader'
 import { ModuleResolverFactory } from './resolver'
 import { writeFiles } from './writer'
 
 export const execute = async (config: Config) => {
-  const files = await generateFiles(config)
-  return writeFiles(files, config.outDir)
+  const files = generateFiles()
+  const modules = await generateFromModules(config)
+  return writeFiles(files, modules, config.outDir)
 }
 
-export const generateFiles = async (config: Config) => {
+export const generateFromModules = async (config: Config) => {
   const { modules, aliases } = await new ModuleLoader(
     new AptosClient(config.nodeUrl),
   ).loadModules(config.modules, config)

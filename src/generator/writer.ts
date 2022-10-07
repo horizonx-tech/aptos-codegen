@@ -3,6 +3,7 @@ import { writeFile } from 'fs/promises'
 import path from 'path'
 
 export const writeFiles = async (
+  files: { content: string; path: string }[],
   targets: {
     types: { content: string; path: string }
     factory?: { content: string; path: string }
@@ -11,16 +12,19 @@ export const writeFiles = async (
   outDir: string,
 ) => {
   mkdirSync(outDir, { recursive: true })
-  await Promise.all(
-    targets.flatMap(({ types, factory, utilities }) => {
+  await Promise.all([
+    ...files.map((file) => write(outDir, file)),
+    ...targets.flatMap(({ types, factory, utilities }) => {
       const dirname = path.dirname(path.join(outDir, types.path))
       mkdirSync(dirname, { recursive: true })
       return [
-        writeFile(path.join(outDir, types.path), types.content),
-        factory && writeFile(path.join(outDir, factory.path), factory.content),
-        utilities &&
-          writeFile(path.join(outDir, utilities.path), utilities.content),
+        write(outDir, types),
+        factory && write(outDir, factory),
+        utilities && write(outDir, utilities),
       ]
     }),
-  )
+  ])
 }
+
+const write = (outDir: string, item: { content: string; path: string }) =>
+  writeFile(path.join(outDir, item.path), item.content)

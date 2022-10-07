@@ -747,22 +747,6 @@ export class CoinUtils {
     const regexp = new RegExp(\`\${this.address}::coin::SupplyConfig(?:<|$)\`)
     return regexp.test(resource.type)
   }
-
-  extractCoinInfoTypeParameters = (type: string) => {
-    const result = new RegExp(\`^\${this.address}::coin::CoinInfo<(.*)>$\`).exec(type)
-    return result && result[1]?.split(', ')
-  }
-
-  extractCoinStoreTypeParameters = (type: string) => {
-    const result = new RegExp(\`^\${this.address}::coin::CoinStore<(.*)>$\`).exec(type)
-    return result && result[1]?.split(', ')
-  }
-
-  extractSupplyConfigTypeParameters = (type: string) => {
-    const result = new RegExp(\`^\${this.address}::coin::SupplyConfig<(.*)>$\`).exec(type)
-    return result && result[1]?.split(', ')
-  }
-
 }
 ",
       "path": "./0x2/CoinUtils.ts",
@@ -869,17 +853,6 @@ export class AccountUtils {
     const regexp = new RegExp(\`\${this.address}::account::OriginatingAddress(?:<|$)\`)
     return regexp.test(resource.type)
   }
-
-  extractAccountTypeParameters = (type: string) => {
-    const result = new RegExp(\`^\${this.address}::account::Account<(.*)>$\`).exec(type)
-    return result && result[1]?.split(', ')
-  }
-
-  extractOriginatingAddressTypeParameters = (type: string) => {
-    const result = new RegExp(\`^\${this.address}::account::OriginatingAddress<(.*)>$\`).exec(type)
-    return result && result[1]?.split(', ')
-  }
-
 }
 ",
       "path": "./framework/AccountUtils.ts",
@@ -969,22 +942,6 @@ export class AptosCoinUtils {
     const regexp = new RegExp(\`\${this.address}::aptos_coin::MintCapStore(?:<|$)\`)
     return regexp.test(resource.type)
   }
-
-  extractAptosCoinTypeParameters = (type: string) => {
-    const result = new RegExp(\`^\${this.address}::aptos_coin::AptosCoin<(.*)>$\`).exec(type)
-    return result && result[1]?.split(', ')
-  }
-
-  extractDelegationsTypeParameters = (type: string) => {
-    const result = new RegExp(\`^\${this.address}::aptos_coin::Delegations<(.*)>$\`).exec(type)
-    return result && result[1]?.split(', ')
-  }
-
-  extractMintCapStoreTypeParameters = (type: string) => {
-    const result = new RegExp(\`^\${this.address}::aptos_coin::MintCapStore<(.*)>$\`).exec(type)
-    return result && result[1]?.split(', ')
-  }
-
 }
 ",
       "path": "./framework/AptosCoinUtils.ts",
@@ -1450,32 +1407,6 @@ export class AptosGovernanceUtils {
     const regexp = new RegExp(\`\${this.address}::aptos_governance::VotingRecords(?:<|$)\`)
     return regexp.test(resource.type)
   }
-
-  extractApprovedExecutionHashesTypeParameters = (type: string) => {
-    const result = new RegExp(\`^\${this.address}::aptos_governance::ApprovedExecutionHashes<(.*)>$\`).exec(type)
-    return result && result[1]?.split(', ')
-  }
-
-  extractGovernanceConfigTypeParameters = (type: string) => {
-    const result = new RegExp(\`^\${this.address}::aptos_governance::GovernanceConfig<(.*)>$\`).exec(type)
-    return result && result[1]?.split(', ')
-  }
-
-  extractGovernanceEventsTypeParameters = (type: string) => {
-    const result = new RegExp(\`^\${this.address}::aptos_governance::GovernanceEvents<(.*)>$\`).exec(type)
-    return result && result[1]?.split(', ')
-  }
-
-  extractGovernanceResponsbilityTypeParameters = (type: string) => {
-    const result = new RegExp(\`^\${this.address}::aptos_governance::GovernanceResponsbility<(.*)>$\`).exec(type)
-    return result && result[1]?.split(', ')
-  }
-
-  extractVotingRecordsTypeParameters = (type: string) => {
-    const result = new RegExp(\`^\${this.address}::aptos_governance::VotingRecords<(.*)>$\`).exec(type)
-    return result && result[1]?.split(', ')
-  }
-
 }
 ",
       "path": "./framework/AptosGovernanceUtils.ts",
@@ -2225,22 +2156,6 @@ export class CoinUtils {
     const regexp = new RegExp(\`\${this.address}::coin::SupplyConfig(?:<|$)\`)
     return regexp.test(resource.type)
   }
-
-  extractCoinInfoTypeParameters = (type: string) => {
-    const result = new RegExp(\`^\${this.address}::coin::CoinInfo<(.*)>$\`).exec(type)
-    return result && result[1]?.split(', ')
-  }
-
-  extractCoinStoreTypeParameters = (type: string) => {
-    const result = new RegExp(\`^\${this.address}::coin::CoinStore<(.*)>$\`).exec(type)
-    return result && result[1]?.split(', ')
-  }
-
-  extractSupplyConfigTypeParameters = (type: string) => {
-    const result = new RegExp(\`^\${this.address}::coin::SupplyConfig<(.*)>$\`).exec(type)
-    return result && result[1]?.split(', ')
-  }
-
 }
 ",
       "path": "./framework/CoinUtils.ts",
@@ -2427,12 +2342,6 @@ export class TableUtils {
     const regexp = new RegExp(\`\${this.address}::table::Box(?:<|$)\`)
     return regexp.test(resource.type)
   }
-
-  extractBoxTypeParameters = (type: string) => {
-    const result = new RegExp(\`^\${this.address}::table::Box<(.*)>$\`).exec(type)
-    return result && result[1]?.split(', ')
-  }
-
 }
 ",
       "path": "./framework/TableUtils.ts",
@@ -3260,22 +3169,6 @@ export class PoolUtils {
     const regexp = new RegExp(\`\${this.address}::pool::Storage(?:<|$)\`)
     return regexp.test(resource.type)
   }
-
-  extractPoolTypeParameters = (type: string) => {
-    const result = new RegExp(\`^\${this.address}::pool::Pool<(.*)>$\`).exec(type)
-    return result && result[1]?.split(', ')
-  }
-
-  extractPoolEventHandleTypeParameters = (type: string) => {
-    const result = new RegExp(\`^\${this.address}::pool::PoolEventHandle<(.*)>$\`).exec(type)
-    return result && result[1]?.split(', ')
-  }
-
-  extractStorageTypeParameters = (type: string) => {
-    const result = new RegExp(\`^\${this.address}::pool::Storage<(.*)>$\`).exec(type)
-    return result && result[1]?.split(', ')
-  }
-
 }
 ",
       "path": "./protocol/PoolUtils.ts",
