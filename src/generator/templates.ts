@@ -62,7 +62,9 @@ const moduleType = ({
 `
     : ''
 
-export const entryFunction = (fn: FunctionStruct) => {
+export const entryFunction = (
+  fn: Omit<FunctionStruct, 'args'> & { args: string[] },
+) => {
   const args = [
     fn.typeArguments.length === 0
       ? undefined

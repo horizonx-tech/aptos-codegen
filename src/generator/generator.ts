@@ -19,10 +19,9 @@ import {
   factoryFileName,
   isEventHandleFieldStruct,
   isResource,
-  isString,
   isTypeParameter,
   toPath,
-  toReservedTypeOrAny,
+  toReservedType,
   typesFileName,
   utilitiesFileName,
 } from './utils'
@@ -120,7 +119,7 @@ const generateTypesContent = (
       entryFunction({
         name,
         typeArguments,
-        args: args.map((type) => toTypeName(type, resolver)),
+        args: args.map((type) => toTSType(type, resolver)),
       }),
   )
 
@@ -143,7 +142,7 @@ const generateTypesContent = (
         )
         return eventsGetter({
           name,
-          type: toTypeName(genericType, resolver),
+          type: toTSType(genericType, resolver),
           typeParameters: structDef.typeParameters,
         })
       }),
@@ -153,7 +152,7 @@ const generateTypesContent = (
     const fields = each.fields.map(({ name, type }) =>
       structField({
         name: name,
-        type: toTypeName(type, resolver, typeCount),
+        type: toTSType(type, resolver, typeCount),
       }),
     )
     const structDef = resolver.getStructDefinition(module.id, each.name)
@@ -173,28 +172,26 @@ const generateTypesContent = (
   })
 }
 
-const toTypeName = (
-  type: TypeStruct,
+const toTSType = (
+  { moduleId, name, genericTypes }: TypeStruct,
   resolver: IModuleResolver,
   typeCount: Record<string, number> = {},
 ): string => {
-  if (isString(type))
-    return isTypeParameter(type) ? type : toReservedTypeOrAny(type)
-  if (!type.moduleId) {
-    const genericTypeNames = type.genericTypes.map((type) =>
-      toTypeName(type, resolver, typeCount),
+  if (isTypeParameter(name)) return name
+  const reservedType = toReservedType(name, moduleId)
+  if (reservedType) {
+    if (!genericTypes?.length) return reservedType
+    const genericTypeNames = genericTypes.map((type) =>
+      toTSType(type, resolver, typeCount),
     )
-    return `Array<${genericTypeNames.join(', ')}>`
+    return `${reservedType}<${genericTypeNames.join(', ')}>`
   }
-  const structDef = resolver.getStructDefinition(type.moduleId, type.name)
-  const typeName =
-    typeCount[type.name] > 1 ? toAlias(type.moduleId, type.name) : type.name
-  return `${typeName}${
-    structDef.typeParameters?.length
-      ? `<${type.genericTypes
-          .slice(0, structDef.typeParameters.length)
-          .map((each) => toTypeName(each, resolver, typeCount))
-          .join(', ')}>`
-      : ''
-  }`
+  const structDef = resolver.getStructDefinition(moduleId, name)
+  if (!structDef) return 'any'
+  const typeName = typeCount[name] > 1 ? toAlias(moduleId, name) : name
+  if (!structDef.typeParameters?.length) return typeName
+  return `${typeName}<${genericTypes
+    .slice(0, structDef.typeParameters.length)
+    .map((each) => toTSType(each, resolver, typeCount))
+    .join(', ')}>`
 }

@@ -3,9 +3,7 @@ import { pascalCase } from 'change-case'
 import { StructDefinition, StructStruct, TypeStruct } from 'src/types'
 import { RESERVERD_MODULES } from './constants'
 import {
-  hasTypeParameters as hasTypeParametersRecursive,
   isJsNativeType,
-  isString,
   isTypeParameter,
   toModuleMapKey,
   toPath,
@@ -13,7 +11,10 @@ import {
 
 export interface IModuleResolver {
   getDependenciesMap: () => Map<string, { path: string; types: Set<string> }>
-  getStructDefinition: (moduleId: string, name: string) => StructDefinition
+  getStructDefinition: (
+    moduleId: string,
+    name: string,
+  ) => StructDefinition | undefined
 }
 
 export class ModuleResolverFactory {
@@ -89,9 +90,7 @@ export class ModuleResolverFactory {
   ) => {
     const typeParameters = Array.from(
       new Set(
-        struct.fields.flatMap(({ type }) =>
-          this.resolveGenericTypeParametersRecursive(type),
-        ),
+        struct.fields.flatMap(({ type }) => this.extractGenericType(type)),
       ),
     ).sort()
     this.structDefinitionMap.set(`${moduleId}::${struct.name}`, {
@@ -100,38 +99,26 @@ export class ModuleResolverFactory {
     return typeParameters
   }
 
-  private resolveGenericTypeParametersRecursive = (
-    type: TypeStruct,
-  ): string[] => {
-    if (!isString(type)) {
-      const genericTypes = type.genericTypes.filter(hasTypeParametersRecursive)
-      if (!genericTypes.length) return []
-    }
-    return this.extractGenericType(type)
-  }
-
   private extractGenericType = (type: TypeStruct): string[] => {
-    if (isString(type)) return isTypeParameter(type) ? [type] : []
-
-    if (!type.moduleId)
-      return type.genericTypes.flatMap(this.extractGenericType)
-
-    const fqn = `${type.moduleId}::${type.name}`
-    const definition = this.structDefinitionMap.get(fqn)
-    if (definition)
-      return type.genericTypes
-        .flatMap(this.resolveGenericTypeParametersRecursive)
-        .slice(0, definition.typeParameters.length)
-
-    const struct = this.structMap.get(fqn)
-    if (!struct) {
-      console.warn('Skip: unknown struct:', fqn)
-      return []
+    const { moduleId, name, genericTypes } = type
+    if (!moduleId) {
+      if (isTypeParameter(name)) return [name]
+      return genericTypes?.flatMap(this.extractGenericType) || []
     }
-    return this.resolveStructGenericTypeParametersRecursive(
-      type.moduleId,
-      struct,
-    )
+    if (!genericTypes?.length) return []
+
+    const fqn = `${moduleId}::${name}`
+    if (!this.structDefinitionMap.has(fqn)) {
+      const struct = this.structMap.get(fqn)
+      if (struct)
+        this.resolveStructGenericTypeParametersRecursive(moduleId, struct)
+      else console.warn('Unknown struct:', fqn)
+    }
+    const definition = this.structDefinitionMap.get(fqn)
+    if (!definition?.typeParameters?.length) return []
+    return genericTypes
+      .flatMap(this.extractGenericType)
+      .slice(0, definition.typeParameters.length)
   }
 }
 

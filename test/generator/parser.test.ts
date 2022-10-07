@@ -1,9 +1,8 @@
 import {
   extractDependencies,
-  extractIdentifiersFromGenericTypeStr,
-  extractTypeNameRecursive,
+  extractTypeStrRecursive,
   parseFromABI,
-  toTypeStruct,
+  parseTypesStr,
 } from 'src/generator/parser'
 import {
   EventStruct,
@@ -26,100 +25,58 @@ describe('parser', () => {
       expect(module.dependencies).toHaveLength(16)
     })
   })
-  describe('toTypeStruct', () => {
-    it('returns arg itself if arg is matched to reserved type or type parameter', () => {
-      expect(toTypeStruct('bool')).toBe('bool')
-      expect(toTypeStruct('u8')).toBe('u8')
-      expect(toTypeStruct('u16')).toBe('u16')
-      expect(toTypeStruct('u32')).toBe('u32')
-      expect(toTypeStruct('u64')).toBe('u64')
-      expect(toTypeStruct('u128')).toBe('u128')
-      expect(toTypeStruct('address')).toBe('address')
-      expect(toTypeStruct('0x1::string::String')).toBe('0x1::string::String')
-      expect(toTypeStruct('T0')).toBe('T0')
-      expect(toTypeStruct('T99')).toBe('T99')
-    })
+  describe('parseTypesStr', () => {
     it('returns name and generic types without module id if arg starts with vector', () => {
-      expect(toTypeStruct('vector<u8>')).toEqual({
+      expect(parseTypesStr('vector<u8>')).toEqual({
         name: 'vector',
-        genericTypes: ['u8'],
+        genericTypes: [{ name: 'u8' }],
       })
-      expect(toTypeStruct('vector<0x1::simple_map::Element<T0, T1>>')).toEqual({
-        name: 'vector',
-        genericTypes: [
-          {
-            moduleId: '0x1::simple_map',
-            name: 'Element',
-            genericTypes: ['T0', 'T1'],
-          },
-        ],
-      })
+      expect(parseTypesStr('vector<0x1::simple_map::Element<T0, T1>>')).toEqual(
+        {
+          name: 'vector',
+          genericTypes: [
+            {
+              moduleId: '0x1::simple_map',
+              name: 'Element',
+              genericTypes: [{ name: 'T0' }, { name: 'T1' }],
+            },
+          ],
+        },
+      )
     })
     it('returns module id and name and generic types if arg is struct', () => {
-      expect(toTypeStruct('0x1::aptos_coin::AptosCoin')).toEqual({
+      expect(parseTypesStr('0x1::aptos_coin::AptosCoin')).toEqual({
         moduleId: '0x1::aptos_coin',
         name: 'AptosCoin',
-        genericTypes: [],
+      })
+    })
+    it('returns arg itself as name if arg is pointer', () => {
+      expect(parseTypesStr('&0x1::coin::FreezeCapability<T0>')).toEqual({
+        name: '&0x1::coin::FreezeCapability',
+        genericTypes: [{ name: 'T0' }],
       })
     })
     it('returns generic types recursive', () => {
       expect(
-        toTypeStruct(
+        parseTypesStr(
           '0x1::example::Generics<vector<u8>, 0x1::example::Generics<address, bool>>',
         ),
       ).toEqual({
         moduleId: '0x1::example',
         name: 'Generics',
         genericTypes: [
-          { name: 'vector', genericTypes: ['u8'] },
+          { name: 'vector', genericTypes: [{ name: 'u8' }] },
           {
             moduleId: '0x1::example',
             name: 'Generics',
-            genericTypes: ['address', 'bool'],
+            genericTypes: [{ name: 'address' }, { name: 'bool' }],
           },
         ],
       })
     })
-    it('returns "any" if arg is unexpected or unsupported', () => {
-      expect(toTypeStruct('&0x1::coin::FreezeCapability<T0>')).toBe('any')
-      expect(toTypeStruct('Unexpected')).toBe('any')
-    })
-  })
-  describe('extractIdentifiersFromGenericTypeStr', () => {
-    it('can extract type names', () => {
-      expect(
-        extractIdentifiersFromGenericTypeStr('u8, 0x1::aptos_coin::AptosCoin'),
-      ).toEqual(['u8', '0x1::aptos_coin::AptosCoin'])
-    })
-    it('can extract genetic type names', () => {
-      expect(extractIdentifiersFromGenericTypeStr('vector<u8>')).toEqual([
-        'vector<u8>',
-      ])
-    })
-    it('can extract multiple generic types', () => {
-      expect(
-        extractIdentifiersFromGenericTypeStr(
-          '0x1::exmple::Generics<address, bool>, 0x1::aptos_coin::AptosCoin',
-        ),
-      ).toEqual([
-        '0x1::exmple::Generics<address, bool>',
-        '0x1::aptos_coin::AptosCoin',
-      ])
-    })
-    it('can extract nested multiple generic types', () => {
-      expect(
-        extractIdentifiersFromGenericTypeStr(
-          '0x1::exmple::Generics<0x1::exmple::Generics<u8, test, address>, 0x1::exmple::Generics<bool, u128>>, 0x1::aptos_coin::AptosCoin',
-        ),
-      ).toEqual([
-        '0x1::exmple::Generics<0x1::exmple::Generics<u8, test, address>, 0x1::exmple::Generics<bool, u128>>',
-        '0x1::aptos_coin::AptosCoin',
-      ])
-    })
-    it('throw error if arg is malformed', () => {
-      expect(() =>
-        extractIdentifiersFromGenericTypeStr('vector<u8, address'),
-      ).toThrowError()
+    it('throw error if no type found or type is malformed', () => {
+      expect(() => parseTypesStr('<')).toThrowError()
+      expect(() => parseTypesStr('vector<u8')).toThrowError()
     })
   })
   describe('extractDependencies', () => {
@@ -129,7 +86,7 @@ describe('parser', () => {
         {
           name: '0x1::coin::transfer',
           typeArguments: [],
-          args: ['address', 'u64'],
+          args: [{ name: 'address' }, { name: 'u64' }],
         },
       ]
       const resources: ResourceStruct[] = []
@@ -144,7 +101,7 @@ describe('parser', () => {
               type: {
                 moduleId: '0x1::option',
                 name: 'Option',
-                genericTypes: ['u8'],
+                genericTypes: [{ name: 'u8' }],
               },
             },
           ],
@@ -226,9 +183,9 @@ describe('parser', () => {
           name: '0x1::example::example',
           typeArguments: [],
           args: [
-            'bool',
-            { name: 'vector', genericTypes: ['u8'] },
-            '0x1::string::String',
+            { name: 'bool' },
+            { name: 'vector', genericTypes: [{ name: 'u8' }] },
+            { moduleId: '0x1::string', name: 'String' },
           ],
         },
       ]
@@ -248,33 +205,35 @@ describe('parser', () => {
       genericTypes: [],
     }
     it('returns arg itself if arg is non-generic native type of move', () => {
-      expect(extractTypeNameRecursive('u8')).toEqual(['u8'])
+      expect(extractTypeStrRecursive({ name: 'u8' })).toEqual(['u8'])
     })
     it('returns name with moduleId if arg is a type in a module', () => {
-      expect(extractTypeNameRecursive(aptosCoinTypeStruct)).toEqual([
+      expect(extractTypeStrRecursive(aptosCoinTypeStruct)).toEqual([
         '0x1::aptos_coin::AptosCoin',
       ])
     })
     it('returns name if arg is not a type in a module', () => {
-      expect(extractTypeNameRecursive(vectorTypeStruct)).toEqual(['vector'])
+      expect(extractTypeStrRecursive(vectorTypeStruct)).toEqual(['vector'])
     })
     it('returns with name of generic parameters if cointains', () => {
       expect(
-        extractTypeNameRecursive({
+        extractTypeStrRecursive({
           moduleId: '0x1::coin',
           name: 'CoinInfo',
-          genericTypes: [aptosCoinTypeStruct, 'u8'],
+          genericTypes: [aptosCoinTypeStruct, { name: 'u8' }],
         }),
       ).toEqual(['0x1::coin::CoinInfo', '0x1::aptos_coin::AptosCoin', 'u8'])
       expect(
-        extractTypeNameRecursive({
+        extractTypeStrRecursive({
           moduleId: '0x1::example',
           name: 'Generics',
           genericTypes: [
             {
               moduleId: '0x1::option',
               name: 'Option',
-              genericTypes: [{ name: 'vector', genericTypes: ['u8'] }],
+              genericTypes: [
+                { name: 'vector', genericTypes: [{ name: 'u8' }] },
+              ],
             },
           ],
         }),
@@ -286,11 +245,11 @@ describe('parser', () => {
       ])
     })
     it('ignore type parameter', () => {
-      expect(extractTypeNameRecursive('T0')).toEqual([])
+      expect(extractTypeStrRecursive({ name: 'T0' })).toEqual([])
       expect(
-        extractTypeNameRecursive({
+        extractTypeStrRecursive({
           name: 'vector',
-          genericTypes: ['T99'],
+          genericTypes: [{ name: 'T99' }],
         }),
       ).toEqual(['vector'])
     })

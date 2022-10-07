@@ -11,7 +11,7 @@ export const STRING_STRUCT: MODULE_STRUCTS = {
       fields: [
         {
           name: 'bytes',
-          type: { name: 'vector', genericTypes: ['u8'] },
+          type: { name: 'vector', genericTypes: [{ name: 'u8' }] },
         },
       ],
     },
@@ -28,7 +28,7 @@ export const OPTION_STRUCT: MODULE_STRUCTS = {
       fields: [
         {
           name: 'vec',
-          type: { name: 'vector', genericTypes: ['T0'] },
+          type: { name: 'vector', genericTypes: [{ name: 'T0' }] },
         },
       ],
     },
@@ -43,13 +43,13 @@ export const ITERABLE_VALUE_STRUCT: MODULE_STRUCTS = {
       name: 'IterableValue',
       abilities: [],
       fields: [
-        { name: 'val', type: 'T1' },
+        { name: 'val', type: { name: 'T1' } },
         {
           name: 'prev',
           type: {
             moduleId: '0x1::option',
             name: 'Option',
-            genericTypes: ['T0'],
+            genericTypes: [{ name: 'T0' }],
           },
         },
         {
@@ -57,7 +57,7 @@ export const ITERABLE_VALUE_STRUCT: MODULE_STRUCTS = {
           type: {
             moduleId: '0x1::option',
             name: 'Option',
-            genericTypes: ['T0'],
+            genericTypes: [{ name: 'T0' }],
           },
         },
       ],

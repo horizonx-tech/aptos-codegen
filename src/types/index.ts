@@ -8,9 +8,11 @@ export type StructTypeStruct = {
   genericTypes: TypeStruct[]
 }
 
-export type TypeStruct =
-  | (Omit<StructTypeStruct, 'moduleId'> & { moduleId?: string })
-  | string
+export type TypeStruct = {
+  moduleId?: string
+  name: string
+  genericTypes?: TypeStruct[]
+}
 
 export type EventHandleTypeStruct = {
   moduleId: '0x1::event'

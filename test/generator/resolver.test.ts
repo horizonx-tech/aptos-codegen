@@ -1,4 +1,4 @@
-import { toTypeStruct } from 'src/generator/parser'
+import { parseTypesStr } from 'src/generator/parser'
 import { ModuleResolverFactory } from 'src/generator/resolver'
 import {
   ITERABLE_VALUE_STRUCT,
@@ -92,9 +92,25 @@ describe('resolver', () => {
                   name: 'example',
                   abilities: [],
                   fields: [
-                    { name: 'boolean', type: 'bool' },
-                    { name: 'string', type: '0x1::string::String' },
-                    { name: 'array', type: 'vector<bool>' },
+                    {
+                      name: 'boolean',
+                      type: { name: 'bool', genericTypes: [] },
+                    },
+                    {
+                      name: 'string',
+                      type: {
+                        moduleId: '0x1::string',
+                        name: 'String',
+                        genericTypes: [],
+                      },
+                    },
+                    {
+                      name: 'array',
+                      type: {
+                        name: 'vector',
+                        genericTypes: [{ name: 'bool', genericTypes: [] }],
+                      },
+                    },
                   ],
                 },
               ],
@@ -144,7 +160,7 @@ describe('resolver', () => {
                   fields: [
                     {
                       name: 'head',
-                      type: toTypeStruct('0x1::option::Option<T0>'),
+                      type: parseTypesStr('0x1::option::Option<T0>'),
                     },
                   ],
                 },
@@ -197,7 +213,7 @@ describe('resolver', () => {
               fields: [
                 {
                   name: 'example',
-                  type: toTypeStruct('0x1::option::Option<u8>'),
+                  type: parseTypesStr('0x1::option::Option<u8>'),
                 },
               ],
             },
@@ -224,7 +240,7 @@ describe('resolver', () => {
               fields: [
                 {
                   name: 'example',
-                  type: toTypeStruct(
+                  type: parseTypesStr(
                     '0x1::iterable_table::IterableValue<u8, T0>',
                   ),
                 },
@@ -253,7 +269,7 @@ describe('resolver', () => {
               fields: [
                 {
                   name: 'example',
-                  type: toTypeStruct(
+                  type: parseTypesStr(
                     '0x1::iterable_table::IterableValue<u8, 0x1::option::Option<T0>>',
                   ),
                 },
@@ -282,7 +298,7 @@ describe('resolver', () => {
               fields: [
                 {
                   name: 'example',
-                  type: toTypeStruct('0x1::option::Option<vector<T0>>'),
+                  type: parseTypesStr('0x1::option::Option<vector<T0>>'),
                 },
               ],
             },
@@ -307,7 +323,7 @@ describe('resolver', () => {
               fields: [
                 {
                   name: 'example',
-                  type: toTypeStruct('0x1::example::Undefined<T0>'),
+                  type: parseTypesStr('0x1::example::Undefined<T0>'),
                 },
               ],
             },

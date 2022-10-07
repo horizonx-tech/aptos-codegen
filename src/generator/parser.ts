@@ -1,5 +1,4 @@
 import { MoveModuleJSON } from '@horizonx/aptos-module-client'
-import { MoveType } from 'aptos/dist/generated'
 import { pascalCase } from 'change-case'
 import {
   EventHandleTypeStruct,
@@ -15,10 +14,8 @@ import {
   isEventHandle,
   isJsNativeType,
   isResource,
-  isString,
   isTypeParameter,
   notSigner,
-  parseFromResourceType,
   toReservedType,
 } from './utils'
 
@@ -30,7 +27,7 @@ export const parseFromABI = (abi: MoveModuleJSON): ModuleStruct => {
     .map(({ name, generic_type_params, params }) => ({
       name,
       typeArguments: generic_type_params,
-      args: params.filter(notSigner).map(toTypeStruct),
+      args: params.filter(notSigner).map(parseTypesStr),
     }))
 
   const resourceStructs = abi.structs.filter(isResource)
@@ -39,7 +36,7 @@ export const parseFromABI = (abi: MoveModuleJSON): ModuleStruct => {
   const events = resourceStructs.filter(hasEventHandle).flatMap(({ fields }) =>
     fields.filter(isEventHandle).map(({ name, type }) => ({
       name: pascalCase(name),
-      type: toTypeStruct(type) as EventHandleTypeStruct,
+      type: parseTypesStr(type) as EventHandleTypeStruct,
     })),
   )
 
@@ -48,7 +45,7 @@ export const parseFromABI = (abi: MoveModuleJSON): ModuleStruct => {
     abilities,
     fields: fields.map(({ name, type }) => ({
       name,
-      type: toTypeStruct(type),
+      type: parseTypesStr(type),
     })),
   }))
 
@@ -95,71 +92,57 @@ export const extractDependencies = (
   return Array.from(
     new Set([
       ...allTypeStructs
-        .flatMap(extractTypeNameRecursive)
-        .filter((type) => !isJsNativeType(toReservedType(type))),
+        .flatMap(extractTypeStrRecursive)
+        .filter(
+          (type) =>
+            !isJsNativeType(toReservedType(type)) && !type.startsWith('&'),
+        ),
       ...additionalDependencies,
       ...ownStructs,
     ]),
   )
 }
 
-export const toTypeStruct = (param: MoveType): TypeStruct => {
-  const reservedType = toReservedType(param)
-  if (reservedType) return param
-  if (isTypeParameter(param)) return param
-  if (param.startsWith('vector')) {
-    const genericTypes = extractIdentifiersFromGenericTypeStr(
-      param.replace(/^.*?</, '').replace(/>$/, ''),
-    )
-    return {
-      name: 'vector',
-      genericTypes: genericTypes.map(toTypeStruct),
+export const parseTypesStr = (str: string) => {
+  let cursor = 0
+  const arr = str.split(/(, |[<>])/)
+  const parentTypes: TypeStruct[] = []
+  while (cursor < arr.length) {
+    const typeStr = arr[cursor++]
+    const seperator = arr[cursor++]
+    if (typeStr) {
+      const type = parseTypeStr(typeStr)
+      if (parentTypes.length) {
+        const parentType = parentTypes[parentTypes.length - 1]
+        if (parentType.genericTypes) parentType.genericTypes.push(type)
+        else parentType.genericTypes = [type]
+      } else parentTypes.push(type)
+      if (seperator === '<') parentTypes.push(type)
     }
+    if (seperator === '>') parentTypes.pop()
   }
-  const res = parseFromResourceType(param)
-  if (!res) {
-    console.warn(`Skip unknown type: ${param}`)
-    return 'any'
-  }
+  if (parentTypes.length !== 1) throw new Error(`Failed to parse: ${str}`)
+  return parentTypes[0]
+}
+
+const parseTypeStr = (str: string): TypeStruct => {
+  if (str.startsWith('&')) return { name: str }
+  const splitted = str.split('::')
+  if (splitted.length !== 3) return { name: str }
   return {
-    moduleId: res.moduleId,
-    name: res.structName,
-    genericTypes: res.genericTypesStr
-      ? extractIdentifiersFromGenericTypeStr(res.genericTypesStr).map(
-          toTypeStruct,
-        )
-      : [],
+    moduleId: `${splitted[0]}::${splitted[1]}`,
+    name: splitted[2],
   }
 }
 
-export const extractIdentifiersFromGenericTypeStr = (str: string) => {
-  const result = []
-  let current = ''
-  for (const each of str.split(', ')) {
-    if (current) {
-      current = [current, each].join(', ')
-      if (!each.includes('>')) continue
-      const numOfLeft = current.match(/</g).length
-      const numOfRight = current.match(/>/g).length
-      if (numOfLeft !== numOfRight) continue
-      result.push(current)
-      current = ''
-      continue
-    }
-    if (each.includes('<') && !each.includes('>')) {
-      current += each
-      continue
-    }
-    result.push(each)
-  }
-  if (current) throw new Error(`Failed to parse generic types: ${str}`)
-  return result
-}
-
-export const extractTypeNameRecursive = (type: TypeStruct): string[] => {
-  if (isString(type)) return isTypeParameter(type) ? [] : [type]
+export const extractTypeStrRecursive = ({
+  name,
+  moduleId,
+  genericTypes,
+}: TypeStruct): string[] => {
+  if (isTypeParameter(name)) return []
   return [
-    type.moduleId ? `${type.moduleId}::${type.name}` : type.name,
-    ...type.genericTypes.flatMap(extractTypeNameRecursive),
+    moduleId ? `${moduleId}::${name}` : name,
+    ...(genericTypes?.flatMap(extractTypeStrRecursive) || []),
   ]
 }

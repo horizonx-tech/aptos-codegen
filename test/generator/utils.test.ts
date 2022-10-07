@@ -91,7 +91,7 @@ describe('utils', () => {
   describe('isEventHandleFieldStruct', () => {
     const struct: StructFieldStruct = {
       name: 'example_events',
-      type: 'u8',
+      type: { name: 'u8' },
     }
     it('returns true if type of field is "0x1::event::EventHandle"', () => {
       expect(
@@ -100,7 +100,7 @@ describe('utils', () => {
           type: {
             moduleId: '0x1::event',
             name: 'EventHandle',
-            genericTypes: ['0x1::sample::ExampleEvent'],
+            genericTypes: [{ moduleId: '0x1::sample::', name: 'ExampleEvent' }],
           },
         }),
       ).toBeTruthy()
@@ -113,7 +113,7 @@ describe('utils', () => {
           type: {
             moduleId: '0x2::event',
             name: 'EventHandle',
-            genericTypes: ['0x1::sample::ExampleEvent'],
+            genericTypes: [{ moduleId: '0x1::sample::', name: 'ExampleEvent' }],
           },
         }),
       ).toBeFalsy()
@@ -123,7 +123,7 @@ describe('utils', () => {
           type: {
             moduleId: '0x1::event',
             name: 'Other',
-            genericTypes: ['0x1::sample::ExampleEvent'],
+            genericTypes: [{ moduleId: '0x1::sample::', name: 'ExampleEvent' }],
           },
         }),
       ).toBeFalsy()
@@ -196,19 +196,19 @@ describe('utils', () => {
       expect(
         hasTypeParameters({
           name: 'example',
-          genericTypes: ['T0'],
+          genericTypes: [{ name: 'T0' }],
         }),
       ).toBeTruthy()
-      expect(hasTypeParameters('T99')).toBeTruthy()
+      expect(hasTypeParameters({ name: 'T99' })).toBeTruthy()
     })
     it('returns false if arg does not have a type parmeter', () => {
       expect(
         hasTypeParameters({
           name: 'example',
-          genericTypes: ['u8'],
+          genericTypes: [{ name: 'u8' }],
         }),
       ).toBeFalsy()
-      expect(hasTypeParameters('u8')).toBeFalsy()
+      expect(hasTypeParameters({ name: 'u8' })).toBeFalsy()
     })
   })
   describe('parseFromResourceType', () => {

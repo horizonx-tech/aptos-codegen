@@ -9,7 +9,7 @@ import {
 
 export const isString = (arg: any): arg is string => typeof arg === 'string'
 
-export const isResource = (struct: MoveStruct) =>
+export const isResource = (struct: { abilities: string[] }) =>
   struct.abilities.includes('key')
 
 export const isEventHandle = ({ type }: MoveStructField) =>
@@ -29,17 +29,23 @@ export const notSigner = (param: string) => param !== '&signer'
 
 export const isJsNativeType = (arg: any) => JS_NATIVE_TYPES.includes(arg)
 
-export const isTypeParameter = (arg: TypeStruct) =>
+export const isTypeParameter = (arg: string) =>
   isString(arg) && TYPE_PARAMETER_REGEX.test(arg)
 
-export const toReservedType = (arg: string): string | undefined =>
-  RESERVED_TYPE_DICT[arg]
+export const toReservedType = (
+  name: string,
+  moduleId?: string,
+): string | undefined =>
+  moduleId
+    ? RESERVED_TYPE_DICT[`${moduleId}::${name}`]
+    : RESERVED_TYPE_DICT[name]
 
-export const toReservedTypeOrAny = (arg: string) => toReservedType(arg) || 'any'
+export const toReservedTypeOrAny = (name: string, moduleId?: string) =>
+  toReservedType(name, moduleId) || 'any'
 
-export const hasTypeParameters = (type: TypeStruct) => {
-  if (isString(type)) return TYPE_PARAMETER_REGEX.test(type)
-  return type.genericTypes.some(hasTypeParameters)
+export const hasTypeParameters = ({ name, genericTypes }: TypeStruct) => {
+  if (genericTypes?.length) return genericTypes.some(hasTypeParameters)
+  return TYPE_PARAMETER_REGEX.test(name)
 }
 
 export const parseFromResourceType = (maybeResourceType: string) => {
