@@ -87,7 +87,7 @@ export const extractDependencies = (
     ...(entryFunctions.length || resources.length
       ? ['AptosModuleClient', 'Types']
       : []),
-    ...(events.length ? ['TypedEvent', 'EventGetterParams'] : []),
+    ...(events.length ? ['TypedVersionedEvent', 'EventGetterParams'] : []),
   ]
   return Array.from(
     new Set([

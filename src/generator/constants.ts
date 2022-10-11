@@ -9,7 +9,7 @@ export const RESERVERD_MODULES = [
     types: [
       'AptosModuleClient',
       'TypedMoveResource',
-      'TypedEvent',
+      'TypedVersionedEvent',
       'EventGetterParams',
     ],
   },

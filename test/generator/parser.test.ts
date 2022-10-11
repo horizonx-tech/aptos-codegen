@@ -136,7 +136,7 @@ describe('parser', () => {
       ])
       expect(extractDependencies(moduleId, [], [], [], [])).toHaveLength(0)
     })
-    it('add "TypedEvent" and "EventGetterParams", if events is not empty', () => {
+    it('add "TypedVersionedEvent" and "EventGetterParams", if events is not empty', () => {
       const moduleId = '0x::example'
       const events: EventStruct[] = [
         {
@@ -155,7 +155,7 @@ describe('parser', () => {
         },
       ]
       expect(extractDependencies(moduleId, [], [], events, [])).toEqual([
-        'TypedEvent',
+        'TypedVersionedEvent',
         'EventGetterParams',
       ])
       expect(extractDependencies(moduleId, [], [], [], [])).toHaveLength(0)
