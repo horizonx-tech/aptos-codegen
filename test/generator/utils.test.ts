@@ -1,4 +1,4 @@
-import { MoveStruct, MoveStructField } from 'aptos/dist/generated'
+import { Types } from 'aptos'
 import {
   factoryFileName,
   hasEventHandle,
@@ -31,7 +31,7 @@ describe('utils', () => {
     })
   })
   describe('isResource', () => {
-    const struct: MoveStruct = {
+    const struct: Types.MoveStruct = {
       name: 'Example',
       abilities: [],
       fields: [],
@@ -47,7 +47,7 @@ describe('utils', () => {
     })
   })
   describe('isEventHandle', () => {
-    const struct: MoveStructField = {
+    const struct: Types.MoveStructField = {
       name: 'example_events',
       type: 'u8',
     }
@@ -64,7 +64,7 @@ describe('utils', () => {
     })
   })
   describe('hasEventHandle', () => {
-    const struct: MoveStruct = {
+    const struct: Types.MoveStruct = {
       name: 'Example',
       abilities: [],
       fields: [{ name: 'example_events', type: 'u8' }],

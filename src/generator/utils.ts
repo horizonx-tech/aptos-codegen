@@ -1,4 +1,4 @@
-import { MoveStruct, MoveStructField } from 'aptos/dist/generated'
+import { Types } from 'aptos'
 import { EventHandleFieldStrut, StructFieldStruct, TypeStruct } from 'src/types'
 import {
   JS_NATIVE_TYPES,
@@ -12,10 +12,10 @@ export const isString = (arg: any): arg is string => typeof arg === 'string'
 export const isResource = (struct: { abilities: string[] }) =>
   struct.abilities.includes('key')
 
-export const isEventHandle = ({ type }: MoveStructField) =>
+export const isEventHandle = ({ type }: Types.MoveStructField) =>
   isString(type) && type.startsWith('0x1::event::EventHandle')
 
-export const hasEventHandle = (struct: MoveStruct) =>
+export const hasEventHandle = (struct: Types.MoveStruct) =>
   struct.fields.some(isEventHandle)
 
 export const isEventHandleFieldStruct = (

@@ -1,4 +1,4 @@
-import { MoveType } from 'aptos/dist/generated'
+import { Types } from 'aptos'
 
 export const JS_NATIVE_TYPES = ['boolean', 'string', 'Array', 'any']
 
@@ -15,7 +15,7 @@ export const RESERVERD_MODULES = [
   },
 ]
 
-export const RESERVED_TYPE_DICT: Partial<Record<MoveType, string>> = {
+export const RESERVED_TYPE_DICT: Partial<Record<Types.MoveType, string>> = {
   bool: 'boolean',
   u8: 'BCS.Uint8',
   u16: 'BCS.Uint16',
