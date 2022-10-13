@@ -61,17 +61,105 @@ describe('config', () => {
       expect(outDir).toBe(additionalConfig.outDir)
       expect(nodeUrl).toBe(additionalConfig.nodeUrl)
     })
-    it('can parse aliases from args', async () => {
-      jest.spyOn(fs, 'readFileSync').mockReturnValue(JSON.stringify(expected))
-      const { aliases } = await configure([
-        '-c',
-        'path-to-configuration-file',
-        '-a',
-        '0x1=framework',
-        '0x2=example',
-      ])
-      expect(aliases['0x1']).toBe('framework')
-      expect(aliases['0x2']).toBe('example')
+    describe('can parse aliases from args', () => {
+      it('from args', async () => {
+        jest.spyOn(fs, 'readFileSync').mockReturnValue(JSON.stringify(expected))
+        const { aliases } = await configure([
+          '-c',
+          'path-to-configuration-file',
+          '-a',
+          '0x1=framework',
+          '0x2=example',
+        ])
+        expect(aliases['0x1']).toBe('framework')
+        expect(aliases['0x2']).toBe('example')
+      })
+      it('from a file', async () => {
+        jest.spyOn(fs, 'readFileSync').mockReturnValue(
+          JSON.stringify({
+            ...expected,
+            aliases: { '0x1': 'framework', '0x2': 'example' },
+          }),
+        )
+        const { aliases } = await configure([
+          '-c',
+          'path-to-configuration-file',
+        ])
+        expect(aliases['0x1']).toBe('framework')
+        expect(aliases['0x2']).toBe('example')
+      })
+    })
+    describe('can parse minifyAbi', () => {
+      it('not passed', async () => {
+        jest.spyOn(fs, 'readFileSync').mockReturnValue(JSON.stringify(expected))
+        const { minifyAbi } = await configure([
+          '-c',
+          'path-to-configuration-file',
+        ])
+        expect(minifyAbi).toBeFalsy()
+      })
+      it('from args', async () => {
+        jest.spyOn(fs, 'readFileSync').mockReturnValue(JSON.stringify(expected))
+        const { minifyAbi } = await configure([
+          '-c',
+          'path-to-configuration-file',
+          '--minify-abi',
+        ])
+        expect(minifyAbi).toBeTruthy()
+      })
+      it('from a file', async () => {
+        jest
+          .spyOn(fs, 'readFileSync')
+          .mockReturnValue(JSON.stringify({ ...expected, minifyAbi: true }))
+        const { minifyAbi } = await configure([
+          '-c',
+          'path-to-configuration-file',
+        ])
+        expect(minifyAbi).toBeTruthy()
+      })
+    })
+    describe('can parse targets', () => {
+      it('not passed', async () => {
+        jest.spyOn(fs, 'readFileSync').mockReturnValue(JSON.stringify(expected))
+        const { targets } = await configure([
+          '-c',
+          'path-to-configuration-file',
+        ])
+        expect(targets).toBeUndefined()
+      })
+      it('from args', async () => {
+        jest.spyOn(fs, 'readFileSync').mockReturnValue(JSON.stringify(expected))
+        const { targets } = await configure([
+          '-c',
+          'path-to-configuration-file',
+          '-t',
+          'entryFunctions',
+          'utilities',
+          'getters',
+        ])
+        expect(targets.entryFunctions).toBeTruthy()
+        expect(targets.utilities).toBeTruthy()
+        expect(targets.getters).toBeTruthy()
+      })
+      it('from a file', async () => {
+        jest.spyOn(fs, 'readFileSync').mockReturnValue(
+          JSON.stringify({
+            ...expected,
+            targets: {
+              entryFunctions: true,
+              utilities: true,
+              getters: true,
+            },
+          }),
+        )
+        const { targets } = await configure([
+          '-c',
+          'path-to-configuration-file',
+        ])
+        expect(targets.entryFunctions).toBeTruthy()
+        expect(targets.utilities).toBeTruthy()
+        expect(targets.getters).toBeTruthy()
+      })
     })
     it('should throw error if outDir is not passed', async () => {
       await expect(

@@ -10,5 +10,11 @@
   "aliases": {
     "0x1": "framework"
   },
-  "abiFilePathPatterns": ["abi/**/*.json"]
+  "abiFilePathPatterns": ["abi/**/*.json"],
+  "minifyAbi": true,
+  "targets": {
+    "entryFunctions": true,
+    "getters": true,
+    "utilities": true
+  }
 }

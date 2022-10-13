@@ -8,10 +8,10 @@ exports[`generator snapshot 1`] = `
 /* tslint:disable */
 /* eslint-disable */
 
-import { AptosModuleClient, MoveModuleJSON, SignerOrClient } from '@horizonx/aptos-module-client'
+import { AptosModuleClient, MoveModuleJSON, MoveModuleJSONMinified, SignerOrClient } from '@horizonx/aptos-module-client'
 import { CoinModule } from './Coin'
   
-const _abi: MoveModuleJSON = {
+const _abi: MoveModuleJSON | MoveModuleJSONMinified = {
   "address": "0x2",
   "name": "coin",
   "friends": [
@@ -953,10 +953,10 @@ export class AptosCoinUtils {
 /* tslint:disable */
 /* eslint-disable */
 
-import { AptosModuleClient, MoveModuleJSON, SignerOrClient } from '@horizonx/aptos-module-client'
+import { AptosModuleClient, MoveModuleJSON, MoveModuleJSONMinified, SignerOrClient } from '@horizonx/aptos-module-client'
 import { AptosGovernanceModule } from './AptosGovernance'
   
-const _abi: MoveModuleJSON = {
+const _abi: MoveModuleJSON | MoveModuleJSONMinified = {
   "address": "0x1",
   "name": "aptos_governance",
   "friends": [],
@@ -1418,10 +1418,10 @@ export class AptosGovernanceUtils {
 /* tslint:disable */
 /* eslint-disable */
 
-import { AptosModuleClient, MoveModuleJSON, SignerOrClient } from '@horizonx/aptos-module-client'
+import { AptosModuleClient, MoveModuleJSON, MoveModuleJSONMinified, SignerOrClient } from '@horizonx/aptos-module-client'
 import { CoinModule } from './Coin'
   
-const _abi: MoveModuleJSON = {
+const _abi: MoveModuleJSON | MoveModuleJSONMinified = {
   "address": "0x1",
   "name": "coin",
   "friends": [
@@ -2389,10 +2389,10 @@ export type TypeInfo = {
 /* tslint:disable */
 /* eslint-disable */
 
-import { AptosModuleClient, MoveModuleJSON, SignerOrClient } from '@horizonx/aptos-module-client'
+import { AptosModuleClient, MoveModuleJSON, MoveModuleJSONMinified, SignerOrClient } from '@horizonx/aptos-module-client'
 import { PoolModule } from './Pool'
   
-const _abi: MoveModuleJSON = {
+const _abi: MoveModuleJSON | MoveModuleJSONMinified = {
   "address": "0x3b6e641ab8f8efad88169e44597b9c6822a158a5292a7aa7c0b41cf821603bd9",
   "name": "pool",
   "friends": [

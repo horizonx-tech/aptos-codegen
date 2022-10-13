@@ -75,8 +75,16 @@ export type Config = {
   abiFilePathPatterns?: string[]
   configurationFile?: string
   aliases?: Partial<Record<Types.Address, string>>
+  minifyAbi?: boolean
+  targets?: Partial<{
+    entryFunctions: boolean
+    getters: boolean
+    utilities: boolean
+  }>
 }
 
-export type RawConfig = Omit<Config, 'aliases'> & {
+export type RawConfig = Omit<Config, 'aliases' | 'targets' | 'minifyABI'> & {
+  minifyAbi?: boolean
   aliases?: string[]
+  targets?: string[]
 }

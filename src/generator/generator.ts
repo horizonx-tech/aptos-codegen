@@ -1,5 +1,6 @@
 import { utilsFileContent } from 'src/files/utils'
 import { ModuleStruct, TypeStruct } from 'src/types'
+import { minifyABI } from './abiMInifier'
 import { IModuleResolver } from './resolver'
 import {
   comments,
@@ -32,6 +33,8 @@ type GeneratorParams = {
   resolver: IModuleResolver
   factoryDisabled?: boolean
   alias?: string
+  minify?: boolean
+  targets?: { entryFunctions?: boolean; getters?: boolean; utilities?: boolean }
 }
 
 export const generateFiles = () => [
@@ -43,25 +46,41 @@ export const generateFiles = () => [
 
 export const generate = (params: GeneratorParams) => {
   const prefix = params.alias ? `./${params.alias}/` : undefined
+
+  const entryFunctionsDisabled =
+    params.module.entryFunctions.length === 0 ||
+    (params.targets && !params.targets.entryFunctions)
+  const gettersDisabled =
+    params.module.resources.length === 0 ||
+    (params.targets && !params.targets.getters)
+
+  const factoryDisabled =
+    params.factoryDisabled || (entryFunctionsDisabled && gettersDisabled)
   return {
-    factory:
-      params.factoryDisabled ||
-      (params.module.entryFunctions.length === 0 &&
-        params.module.resources.length === 0)
-        ? undefined
-        : {
-            content: factory({
-              name: params.module.name,
-              abi: params.module.abi,
-            }),
-            path: toPath(factoryFileName(params.module.name), prefix),
-          },
+    factory: factoryDisabled
+      ? undefined
+      : {
+          content: factory({
+            name: params.module.name,
+            abi: params.minify
+              ? minifyABI(
+                  params.module.abi,
+                  params.targets && {
+                    entryFunctionsDisabled: !params.targets.entryFunctions,
+                    gettersDisabled: !params.targets.getters,
+                  },
+                )
+              : params.module.abi,
+          }),
+          path: toPath(factoryFileName(params.module.name), prefix),
+        },
     types: {
       content: generateTypes(params),
       path: toPath(typesFileName(params.module.name), prefix),
     },
     utilities:
-      params.module.resources.length === 0
+      params.module.resources.length === 0 ||
+      (params.targets && !params.targets.utilities)
         ? undefined
         : {
             content: generateUtilities(params),
@@ -113,42 +132,48 @@ const generateTypes = (params: GeneratorParams) => {
 }
 
 const generateTypesContent = (
-  { module, resolver }: GeneratorParams,
+  { module, resolver, targets: moduleTarget }: GeneratorParams,
   typeCount: Record<string, number>,
 ) => {
-  const entryFunctions = module.entryFunctions.map(
-    ({ name, typeArguments, args }) =>
-      entryFunction({
-        name,
-        typeArguments,
-        args: args.map((type) => toTSType(type, resolver)),
-      }),
-  )
-
-  const resourceGetters = module.resources.map(({ name }) => {
-    const structDef = resolver.getStructDefinition(module.id, name)
-    return resourceGetter({
-      name,
-      typeParameters: structDef.typeParameters,
-    })
-  })
-
-  const eventsGetters = module.structs
-    .filter(isResource)
-    .flatMap(({ fields }) =>
-      fields.filter(isEventHandleFieldStruct).map(({ name, type }) => {
-        const genericType = type.genericTypes[0]
-        const structDef = resolver.getStructDefinition(
-          genericType.moduleId,
-          genericType.name,
+  const entryFunctions =
+    moduleTarget && !moduleTarget.entryFunctions
+      ? []
+      : module.entryFunctions.map(({ name, typeArguments, args }) =>
+          entryFunction({
+            name,
+            typeArguments,
+            args: args.map((type) => toTSType(type, resolver)),
+          }),
         )
-        return eventsGetter({
-          name,
-          type: toTSType(genericType, resolver),
-          typeParameters: structDef.typeParameters,
+
+  const resourceGetters =
+    moduleTarget && !moduleTarget.getters
+      ? []
+      : module.resources.map(({ name }) => {
+          const structDef = resolver.getStructDefinition(module.id, name)
+          return resourceGetter({
+            name,
+            typeParameters: structDef.typeParameters,
+          })
         })
-      }),
-    )
+
+  const eventsGetters =
+    moduleTarget && !moduleTarget.getters
+      ? []
+      : module.structs.filter(isResource).flatMap(({ fields }) =>
+          fields.filter(isEventHandleFieldStruct).map(({ name, type }) => {
+            const genericType = type.genericTypes[0]
+            const structDef = resolver.getStructDefinition(
+              genericType.moduleId,
+              genericType.name,
+            )
+            return eventsGetter({
+              name,
+              type: toTSType(genericType, resolver),
+              typeParameters: structDef.typeParameters,
+            })
+          }),
+        )
 
   const structs = module.structs.map((each) => {
     const fields = each.fields.map(({ name, type }) =>

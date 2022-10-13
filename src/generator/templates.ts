@@ -1,4 +1,7 @@
-import { MoveModuleJSON } from '@horizonx/aptos-module-client'
+import {
+  MoveModuleJSON,
+  MoveModuleJSONMinified,
+} from '@horizonx/aptos-module-client'
 import { pascalCase } from 'change-case'
 import { FunctionStruct } from 'src/types'
 
@@ -7,12 +10,15 @@ export const factory = ({
   abi,
 }: {
   name: string
-  abi: MoveModuleJSON
-}) => `${comments}
-import { AptosModuleClient, MoveModuleJSON, SignerOrClient } from '@horizonx/aptos-module-client'
+  abi: MoveModuleJSON | MoveModuleJSONMinified
+}) => `${comments}import { AptosModuleClient, MoveModuleJSON, MoveModuleJSONMinified, SignerOrClient } from '@horizonx/aptos-module-client'
 import { ${name}Module } from './${name}'
   
-const _abi: MoveModuleJSON = ${JSON.stringify(abi, undefined, 2)}
+const _abi: MoveModuleJSON | MoveModuleJSONMinified = ${JSON.stringify(
+  abi,
+  undefined,
+  2,
+)}
   
 export class ${name}ModuleFactory {
   static readonly abi = _abi

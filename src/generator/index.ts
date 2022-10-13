@@ -20,8 +20,14 @@ export const generateFromModules = async (config: Config) => {
     generate({
       module,
       resolver: resolverFactory.build(module.id, module.dependencies),
-      factoryDisabled: !config.modules.includes(module.id),
+      factoryDisabled:
+        !config.modules.includes(module.id) ||
+        (config.targets &&
+          !config.targets.entryFunctions &&
+          !config.targets.getters),
       alias: aliases[module.address],
+      minify: config.minifyAbi,
+      targets: config.targets,
     }),
   )
 }

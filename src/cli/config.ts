@@ -26,13 +26,24 @@ export const configure = async (args: string[]): Promise<Config> => {
       description: 'Node URL',
       type: 'string',
     })
-    .option('--aliases', {
+    .option('aliases', {
       alias: 'a',
       description: 'Aliases of address: {address}={alias}',
       type: 'string',
       array: true,
     })
-    .option('--abi-file-path-patterns', {
+    .option('minify-abi', {
+      description: 'Minify ABI output to factory',
+      type: 'boolean',
+    })
+    .option('targets', {
+      alias: 't',
+      description:
+        'Generation target(s) of code. entryFunctions/getters/utilities',
+      type: 'string',
+      array: true,
+    })
+    .option('abi-file-path-patterns', {
       alias: 'f',
       description: 'File Path Patterns(glob) of ABI',
       type: 'string',
@@ -40,9 +51,10 @@ export const configure = async (args: string[]): Promise<Config> => {
     })
     .help().argv
 
-  const { aliases, ...rest } = rawConfigArgs
+  const { aliases, targets, ...rest } = rawConfigArgs
   config = {
     ...rest,
+    targets: targets?.reduce((res, target) => ({ ...res, [target]: true }), {}),
     aliases: aliases?.reduce((res, each) => {
       const [address, alias] = each.split('=')
       return { ...res, [address]: alias }
@@ -55,9 +67,13 @@ export const configure = async (args: string[]): Promise<Config> => {
     config = {
       ...configInFile,
       ...config,
-      aliases: {
+      aliases: (configInFile.aliases || config.aliases) && {
         ...configInFile.aliases,
         ...config.aliases,
+      },
+      targets: (configInFile.targets || config.targets) && {
+        ...configInFile.targets,
+        ...config.targets,
       },
       modules: mergeArrays(configInFile.modules, config.modules),
     }
