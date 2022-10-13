@@ -5,14 +5,14 @@
     "aptos",
     "TypeScript"
   ],
-  "version": "0.11.0",
+  "version": "0.12.0",
   "author": "HorizonX",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/horizonx-tech/aptos-codegen.git"
   },
-  "homepage": "https://github.com/horizonx-tech/aptos-codegen#readme",
+  "homepage": "https://leizd.com/devcentral",
   "bin": {
     "aptos-codegen": "dist/cli/index.js"
   },
