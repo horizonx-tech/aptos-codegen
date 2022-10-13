@@ -64,6 +64,8 @@ aptos-codegen -c {configuration-file}
 | `-u`\*             | Aptos node URL.                                                          | `https://fullnode.devnet.aptoslabs.com/v1`             |
 | `-f`               | ABI file path pattern(s) (glob). (\*1)                                   | `abi/**/*.json`                                        |
 | `-a`               | Directory name alias(es) of an address for duplicate name modules. (\*2) | `0x1=framework`                                        |
+| `-t`               | Generation target(s) of code. `entryFunctions`/`getters`/`utilities`     | `entryFunctions`, `entryFunctions utilities`           |
+| `--minify-abi`     | Minify ABI output to factory.                                            | -                                                      |
 | `-c`               | Read options from this configuration file. (\*3)                         | `./aptos-codegen.json` ([example](aptos-codegen.json)) |
 
 \*1: ABIs loaded from files are referenced in preference to those loaded from the chain.
@@ -72,7 +74,7 @@ aptos-codegen -c {configuration-file}
 
 \*3: Configuration can be overwritten by arguments.
 
-### Factory
+### Factory of Module Interface
 
 | Function | Description                        | Arguments                                    |
 | -------- | ---------------------------------- | -------------------------------------------- |
@@ -90,17 +92,24 @@ const coin = CoinModuleFactory.connect(signerOrClient)
 const coin = CoinModuleFactory.connect(signerOrClient, "0xAnotherAddress")
 ```
 
-### utils
+### Utils of Module
 
-| Function                 | Description                                         | Arguments                 |
-| ------------------------ | --------------------------------------------------- | ------------------------- |
-| isXXX                    | a type guard of the resource                        | `resource`: MoveResource  |
-| extractXXXTypeParameters | extract type parameters string of the resource type | `type`: MoveResource.type |
+| Function | Description                  | Arguments                |
+| -------- | ---------------------------- | ------------------------ |
+| isXXX    | a type guard of the resource | `resource`: MoveResource |
 
+
+### Common Utils
+| Function              | Description                                         | Arguments                 |
+| --------------------- | --------------------------------------------------- | ------------------------- |
+| extractTypeParameters | extract type parameters string of the resource type | `type`: MoveResource.type |
+| typeToString          | convert parsed type to string                       | `type`: ParsedType        |
+| parseTypeStr          | parse type str                                      | `type`: MoveResource.type |
 
 ```typescript
 import { Types } from 'aptos'
 import { CoinUtils } from './__generated__/CoinUtils'
+import { extractTypeParameters, parseTypeStr, typeToString } from 'src/libs/modules/__generated__/utils'
 
 const coinUtils = new CoinUtils() // or new CoinUtils("0xAnotherAddress")
 
@@ -118,6 +127,21 @@ if (coinUtils.isCoinInfo(resources[0])) {
 resources.filter(coinUtils.isCoinInfo)
   .forEach((resource) => console.log(resource.data.symbol))  // You can access as CoinInfo
 
-const coins = resources.filter(coinUtils.isCoinInfo).map(({ type }) => coinUtils.extractCoinInfoTypeParameters(type))
+const coins = resources.filter(coinUtils.isCoinInfo).map(({ type }) => {
+  const parsedTypes = extractTypeParameters(type)
+  return parsedTypes.type
+})
 console.log(coins) // ["0x123456::coin::CoinA", "0x123456::coin::CoinB"]
+
+const exampleStruct = { type: "0x1::exmaple::Example<0x123456::coin::CoinA, 0x1::coin::CoinInfo<0x123456::coin::CoinB>>", data: {...} }
+const parsedType = parseTypeStr(coinA.type)
+console.log(parsedType) 
+  // { 
+  //   type: "0x1::coin::Example",
+  //   genericTypes: [
+  //     { type: "0x123456::coin::CoinA" },
+  //     { type: "0x1::coin::CoinInfo", genericTypes: [{ type: "0x123456::coin::CoinB" }] }
+  //   ]
+  // }
+console.log(typeToString(parsedType)) // "0x1::exmaple::Example<0x123456::coin::CoinA, 0x1::coin::CoinInfo<0x123456::coin::CoinB>>"
 ```
