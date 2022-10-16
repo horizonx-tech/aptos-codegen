@@ -1,8 +1,10 @@
+import { Types } from 'aptos'
 import { utilsFileContent } from 'src/files/utils'
 import { ModuleStruct, TypeStruct } from 'src/types'
 import { minifyABI } from './abiMInifier'
 import { IModuleResolver } from './resolver'
 import {
+  addresses,
   comments,
   entryFunction,
   eventsGetter,
@@ -32,20 +34,27 @@ type GeneratorParams = {
   module: ModuleStruct
   resolver: IModuleResolver
   factoryDisabled?: boolean
-  alias?: string
+  varAlias: string
+  dirAlias?: string
   minify?: boolean
   targets?: { entryFunctions?: boolean; getters?: boolean; utilities?: boolean }
 }
 
-export const generateFiles = () => [
+export const generateFiles = (params: {
+  addressAliases: Record<string, Types.Address>
+}) => [
   {
-    content: `${comments}${utilsFileContent}`,
+    content: addresses(params.addressAliases),
+    path: 'addresses.ts',
+  },
+  {
+    content: `${comments}\n${utilsFileContent}`,
     path: 'utils.ts',
   },
 ]
 
 export const generate = (params: GeneratorParams) => {
-  const prefix = params.alias ? `./${params.alias}/` : undefined
+  const prefix = params.dirAlias ? `./${params.dirAlias}/` : undefined
 
   const entryFunctionsDisabled =
     params.module.entryFunctions.length === 0 ||
@@ -71,6 +80,8 @@ export const generate = (params: GeneratorParams) => {
                   },
                 )
               : params.module.abi,
+            addressAlias: params.varAlias,
+            dirAliased: !!params.dirAlias,
           }),
           path: toPath(factoryFileName(params.module.name), prefix),
         },
@@ -89,7 +100,12 @@ export const generate = (params: GeneratorParams) => {
   }
 }
 
-const generateUtilities = ({ module, resolver }: GeneratorParams) => {
+const generateUtilities = ({
+  module,
+  resolver,
+  varAlias: addrAlias,
+  dirAlias,
+}: GeneratorParams) => {
   const resourceTypeGuards = module.resources.map(({ name }) => {
     const structDef = resolver.getStructDefinition(module.id, name)
     return resourceTypeGuard({
@@ -101,10 +117,11 @@ const generateUtilities = ({ module, resolver }: GeneratorParams) => {
   })
 
   return utilities({
-    address: module.address,
+    addressAlias: addrAlias,
     moduleName: module.name,
     resourceNames: module.resources.map(({ name }) => name),
     utilitiesContents: [...resourceTypeGuards],
+    dirAliased: !!dirAlias,
   })
 }
 
@@ -123,7 +140,7 @@ const generateTypes = (params: GeneratorParams) => {
     params.module.id,
     dependenciesMap,
     typeCount,
-    !!params.alias,
+    !!params.dirAlias,
   )
   return types({
     importsContent,

@@ -24,8 +24,15 @@ export class ModuleLoader {
     if (abiFilePathPatterns) await this.loadABIFromLocal(abiFilePathPatterns)
     await Promise.all(moduleIds.map(this.loadModule))
     const modules = Array.from(this.moduleMap.values())
-    const aliases = this.createAddressAliasesForDuplicatedNameModules(modules)
-    return { modules, aliases: { ...aliases, ...options.aliases } }
+    const dirAliases = this.createAddressAliasesForDuplicatedNameModules(
+      modules,
+      options.aliases,
+    )
+    const varAliases = this.createAddressAliasesForVariableName(
+      modules.map(({ address }) => address),
+      options.aliases,
+    )
+    return { modules, dirAliases, varAliases }
   }
 
   private loadModule = async (id: string) => {
@@ -93,6 +100,7 @@ export class ModuleLoader {
 
   private createAddressAliasesForDuplicatedNameModules = (
     modules: ModuleStruct[],
+    optionAliases?: Partial<Record<string, string>>,
   ): Partial<Record<Types.Address, string>> => {
     const moduleNamesDict = modules.reduce<
       Partial<Record<string, Types.Address[]>>
@@ -101,7 +109,7 @@ export class ModuleLoader {
       else res[name] = [address]
       return res
     }, {})
-    return Object.values(moduleNamesDict).reduce((res, addresses) => {
+    const aliases = Object.values(moduleNamesDict).reduce((res, addresses) => {
       if (addresses.length <= 1) return res
       return {
         ...res,
@@ -111,5 +119,30 @@ export class ModuleLoader {
         ),
       }
     }, {})
+    return { ...aliases, ...optionAliases }
+  }
+
+  private createAddressAliasesForVariableName = (
+    addresses: Types.Address[],
+    aliases: Partial<Record<string, string>> = {},
+  ): Record<Types.Address, string> => {
+    const sorted = Array.from(new Set(addresses)).sort()
+    return [
+      ...sorted.filter((address) => aliases[address]),
+      ...sorted.filter((address) => !aliases[address]),
+    ].reduce(
+      (res, address) => {
+        const alias = aliases[address]
+        return {
+          addresses: {
+            ...res.addresses,
+            [address]:
+              alias && !/^\d/.test(alias) ? alias : `address_${res.count++}`,
+          },
+          count: res.count,
+        }
+      },
+      { addresses: {}, count: 0 },
+    ).addresses as Record<Types.Address, string>
   }
 }

@@ -6,17 +6,18 @@ import { ModuleResolverFactory } from './resolver'
 import { writeFiles } from './writer'
 
 export const execute = async (config: Config) => {
-  const files = generateFiles()
-  const modules = await generateFromModules(config)
+  const { modules, addressAliases } = await generateFromModules(config)
+  const files = generateFiles({ addressAliases })
   return writeFiles(files, modules, config.outDir)
 }
 
 export const generateFromModules = async (config: Config) => {
-  const { modules, aliases } = await new ModuleLoader(
+  const { modules, dirAliases, varAliases } = await new ModuleLoader(
     new AptosClient(config.nodeUrl),
   ).loadModules(config.modules, config)
-  const resolverFactory = new ModuleResolverFactory(modules, aliases)
-  return modules.map((module) =>
+  const resolverFactory = new ModuleResolverFactory(modules, dirAliases)
+
+  const generated = modules.map((module) =>
     generate({
       module,
       resolver: resolverFactory.build(module.id, module.dependencies),
@@ -25,9 +26,12 @@ export const generateFromModules = async (config: Config) => {
         (config.targets &&
           !config.targets.entryFunctions &&
           !config.targets.getters),
-      alias: aliases[module.address],
+      varAlias: varAliases[module.address],
+      dirAlias: dirAliases[module.address],
       minify: config.minifyAbi,
       targets: config.targets,
     }),
   )
+
+  return { modules: generated, addressAliases: varAliases }
 }

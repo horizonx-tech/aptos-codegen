@@ -1,0 +1,59 @@
+[
+  {
+    "abi": {
+      "address": "0x3",
+      "name": "coin",
+      "friends": ["0x1::aptos_coin", "0x1::genesis"],
+      "exposed_functions": [
+        {
+          "name": "transfer",
+          "visibility": "public",
+          "is_entry": true,
+          "generic_type_params": [
+            {
+              "constraints": []
+            }
+          ],
+          "params": ["&signer", "address", "u64"],
+          "return": []
+        }
+      ],
+      "structs": [
+        {
+          "name": "CoinStore",
+          "is_native": false,
+          "abilities": ["key"],
+          "generic_type_params": [
+            {
+              "constraints": []
+            }
+          ],
+          "fields": [
+            {
+              "name": "withdraw_events",
+              "type": "0x1::event::EventHandle<0x1::coin::WithdrawEvent>"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "abi": {
+      "address": "0x3",
+      "name": "aptos_governance",
+      "friends": [],
+      "exposed_functions": [
+        {
+          "name": "vote",
+          "visibility": "public",
+          "is_entry": true,
+          "generic_type_params": [],
+          "params": ["&signer", "address", "u64", "bool"],
+          "return": []
+        }
+      ],
+      "structs": []
+    }
+  }
+]

@@ -27,10 +27,11 @@ export type Aggregator = {
 /* eslint-disable */
 import { AptosModuleClient, MoveModuleJSON, MoveModuleJSONMinified, SignerOrClient } from '@horizonx/aptos-module-client'
 import { CoinModule } from './Coin'
+import { address_0 } from './addresses'
   
 const _abi: MoveModuleJSON | MoveModuleJSONMinified = {
   "name": "coin",
-  "address": "0x1",
+  "address": address_0,
   "exposed_functions": [
     {
       "name": "freeze_coin_store",

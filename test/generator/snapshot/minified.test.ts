@@ -1,7 +1,7 @@
 import { generateFromModules } from 'src/generator'
 
 it('snapshot minified', async () => {
-  const files = await generateFromModules({
+  const { modules } = await generateFromModules({
     nodeUrl: 'https://fullnode.devnet.aptoslabs.com/v1',
     outDir: 'test/__snapshots__',
     modules: ['0x1::coin'],
@@ -9,6 +9,6 @@ it('snapshot minified', async () => {
     minifyAbi: true,
   })
   expect(
-    files.sort((a, b) => (a.types.path > b.types.path ? 1 : -1)),
+    modules.sort((a, b) => (a.types.path > b.types.path ? 1 : -1)),
   ).toMatchSnapshot()
 })

@@ -17,7 +17,7 @@ describe('generator', () => {
     })
   })
   it('snapshot', async () => {
-    const files = await generateFromModules({
+    const { modules } = await generateFromModules({
       nodeUrl: 'https://fullnode.devnet.aptoslabs.com/v1',
       outDir: 'test/__snapshots__',
       modules: [
@@ -25,6 +25,8 @@ describe('generator', () => {
         '0x1::aptos_governance',
         '0x1::iterable_table',
         '0x2::coin',
+        '0x3::coin',
+        '0x3::aptos_governance',
         '0x3b6e641ab8f8efad88169e44597b9c6822a158a5292a7aa7c0b41cf821603bd9::pool',
       ],
       aliases: {
@@ -35,7 +37,7 @@ describe('generator', () => {
       abiFilePathPatterns: ['abi/**/*.json'],
     })
     expect(
-      files.sort((a, b) => (a.types.path > b.types.path ? 1 : -1)),
+      modules.sort((a, b) => (a.types.path > b.types.path ? 1 : -1)),
     ).toMatchSnapshot()
   })
 })
