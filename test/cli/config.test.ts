@@ -88,6 +88,28 @@ describe('config', () => {
         expect(aliases['0x1']).toBe('framework')
         expect(aliases['0x2']).toBe('example')
       })
+      it('can resolve an alias to an address', async () => {
+        const modulesWithAlias = [
+          'framework::coin',
+          'example::event',
+          '0x3::raw',
+        ]
+        jest.spyOn(fs, 'readFileSync').mockReturnValue(
+          JSON.stringify({
+            ...expected,
+            aliases: { '0x1': 'framework', '0x2': 'example' },
+            modules: modulesWithAlias,
+          }),
+        )
+        const { modules } = await configure([
+          '-c',
+          'path-to-configuration-file',
+        ])
+        expect(modules).toHaveLength(modulesWithAlias.length)
+        expect(modules[0]).toBe('0x1::coin')
+        expect(modules[1]).toBe('0x2::event')
+        expect(modules[2]).toBe('0x3::raw')
+      })
     })
     describe('can parse minifyAbi', () => {
       it('not passed', async () => {

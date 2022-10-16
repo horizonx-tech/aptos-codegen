@@ -17,7 +17,7 @@ export class ModuleLoader {
     moduleIds: string[],
     options: {
       abiFilePathPatterns?: string[]
-      aliases?: Partial<Record<string, string>>
+      aliases?: Partial<Record<Types.Address, string>>
     } = {},
   ) => {
     const { abiFilePathPatterns } = options

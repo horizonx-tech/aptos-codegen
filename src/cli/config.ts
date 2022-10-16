@@ -1,3 +1,4 @@
+import { Types } from 'aptos'
 import { readFileSync } from 'fs'
 import { Config, RawConfig } from 'src/types'
 import yargs from 'yargs'
@@ -78,6 +79,9 @@ export const configure = async (args: string[]): Promise<Config> => {
       modules: mergeArrays(configInFile.modules, config.modules),
     }
   }
+  if (config.aliases) {
+    config.modules = resolveAddress(config.modules, config.aliases)
+  }
   return isValidConfig(config) && config
 }
 
@@ -90,3 +94,18 @@ const isValidConfig = (config: Partial<Config>): config is Config => {
 
 const mergeArrays = <T>(...maybeArrays: (T | null | undefined)[][]): T[] =>
   maybeArrays.filter(Boolean).flat()
+
+const resolveAddress = (
+  moduleIds: string[],
+  aliases: Partial<Record<Types.Address, string>>,
+) => {
+  const aliasesReversed = Object.entries(aliases).reduce<
+    Partial<Record<string, Types.Address>>
+  >((res, [key, value]) => ({ ...res, [value]: key }), {})
+  return moduleIds.map((moduleId) => {
+    const [alias, name] = moduleId.split('::')
+    const address = aliasesReversed[alias]
+    if (address) return `${address}::${name}`
+    return moduleId
+  })
+}
