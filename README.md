@@ -80,8 +80,8 @@ aptos-codegen -c {configuration-file}
 | -------- | ---------------------------------- | -------------------------------------------- |
 | connect  | creates the module client instance | `signerOrClient`: AptosClient or Signer(\*1) |
 
-\*1 implements `signAndSubmitTransaction: (payload, options) => Promise`. \
-You can use [aptos-wallet-connector](https://github.com/horizonx-tech/aptos-wallet-connector).
+\*1 `Signer` is a implementation of `signAndSubmitTransaction: (payload, options) => Promise<string | { hash: string }>`, \
+such as [aptos-wallet-connector](https://github.com/horizonx-tech/aptos-wallet-connector) or [aptos-wallet-adapter](https://github.com/hippospace/aptos-wallet-adapter).
 
 ```typescript
 import { CoinModuleFactory } from './__generated__/CoinModuleFactory'
